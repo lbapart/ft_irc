@@ -5,7 +5,7 @@
 # include <string>
 # include <map>
 
-# include "Defines.hpp"
+# include "General.hpp"
 
 class Channel;
 
@@ -13,15 +13,19 @@ class Client
 {
 	private:
 		int								_socket;
+		std::string 					_username;
 		std::string						_nickname;
 		std::string						_password;
-		std::map<std::string, Channel> 	_channels;
 	public:
-		Client(int socket, const std::string& password);
+		Client(struct newConnection& newClient);
 		~Client();
 		void join(const std::string& channel, const std::string& password);
 		void leave(const std::string& channel);
 		void send(const std::string& channel, const std::string& message);
+		//accessors
+		int getSocket() const;
+		std::string getNickname() const;
+		std::string getPassword() const;
 };
 
 

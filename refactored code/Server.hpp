@@ -22,7 +22,7 @@
 
 # include <cerrno>
 
-# include "Defines.hpp"
+# include "General.hpp"
 # include "Channel.hpp"
 # include "Client.hpp"
 
@@ -74,7 +74,7 @@ class Server
 		std::string	getClientMessage(int fd);
 		void		clientDisconnected(int fd);
 		void		sendResponse(int fd, const std::string& response);
-
+		int			authentificateConnection(struct newConnection& newClient);
 };
 
 #endif

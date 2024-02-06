@@ -5,7 +5,7 @@
 # include <string>
 # include <map>
 
-# include "Defines.hpp"
+# include "General.hpp"
 
 class Client;
 
