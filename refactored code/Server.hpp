@@ -14,10 +14,17 @@
 # include <fcntl.h>
 # include <cstring>
 # include <algorithm>
+# include <sstream>
+# include <iomanip>
+# include <ctime>
+# include <chrono>
+# include <limits>
 
 # include <cerrno>
 
 # include "Defines.hpp"
+# include "Channel.hpp"
+# include "Client.hpp"
 
 class Server
 {
@@ -27,8 +34,8 @@ class Server
 		std::string							_password;
 		struct sockaddr_in					_addr;
 		std::vector<pollfd>					_fds;
-		// std::map<std::string, Channel>		_channels;
-		// std::map<std::string, Client>		_clients;
+		std::map<std::string, Channel>		_channels;
+		std::map<std::string, Client>		_clients;
 	public:
 		class SocketCreationException : public std::exception
 		{
