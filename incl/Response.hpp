@@ -14,6 +14,8 @@ class Response
 		static const std::string&	OKconnectionSuccess(const std::string& nickname);
 		// Failed connection, takes nickname as argument (const std::string& nickname)
 		static const std::string&	ERRconnectionFailed(const std::string& nickname);
+		// Failed connection, invalid password, takes nickname as argument (const std::string& nickname)
+		static const std::string&	ERRconnectionInvalidPassword(const std::string& nickname);
 
 		// Successful join, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
 		static const std::string&	OKjoinSuccess(const std::string& nickname, const std::string& channel);
@@ -29,6 +31,8 @@ class Response
 		static const std::string&	OKleaveSuccess(const std::string& nickname, const std::string& channel);
 		// Failed leave, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
 		static const std::string&	ERRleaveFailed(const std::string& nickname, const std::string& channel);
+
+
 };
 
 #endif
