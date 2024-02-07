@@ -16,10 +16,29 @@ struct newConnection
 };
 
 
+typedef enum e_command
+{
+    MODE,
+    NICK,
+    PART,
+    USER,
+    TOPIC,
+    NAMES,
+    PRIVMSG,
+    JOIN,
+    KICK,
+    QUIT,
+    LIST,
+    OPERATOR,
+    INVITE,
+    UNKNOWN,
+    LEAVE
+} t_command;
+
 struct request
 {
     std::string message; //stores the message sent by the client like private message or channel message to all
-    std::string command; //stores commands like join, mode, leave, etc.
+    t_command   command; //stores commands like join, mode, leave, etc.
     std::string modeFlag; //stores mode flags like -i, -t, -k, -o, -l
     std::string channelPassword; //stores the password of the channel
     std::string requestFd; //stores the fd of the client that sent the request

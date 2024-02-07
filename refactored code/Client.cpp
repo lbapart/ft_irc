@@ -70,55 +70,21 @@ void Client::setServer(Server* server)
 
 void Client::commandHandler(request & request)
 {
-
-	if (request.command == "JOIN")
+	switch (request.command)
 	{
-		join(request.argument, request.channelPassword);
-		return;
+		case (JOIN): join(request.argument, request.channelPassword);	break;
+		case (LEAVE): leave();											break;
+		case (MODE): modeHandler(request.modeFlag, request.argument);	break;
+		case (KICK): kick(request.argument);							break;
+		case (INVITE): invite(request.argument);						break;
+		case (TOPIC): topic(request.argument);							break;
+		case (NICK): changeNickname(request.argument);					break;
+		case (USER): changeUsername(request.argument);					break;
+		case (PRIVMSG): sendToUser(request.argument, request.message);	break;
+		default: sendToAll(request.argument);
 	}
-	else if (request.command == "LEAVE")
-	{
-		leave();
-		return;
-	}
-	else if (request.command == "MODE")
-	{
-		modeHandler(request.modeFlag, request.argument);
-		return;
-	}
-	else if (request.command == "KICK")
-	{
-		kick(request.argument);
-		return;
-	}
-	else if (request.command == "INVITE")
-	{
-		invite(request.argument);
-		return;
-	}
-	else if (request.command == "TOPIC")
-	{
-		topic(request.argument);
-		return;
-	}
-	else if (request.command == "NICK")
-	{
-		changeNickname(request.argument);
-		return;
-	}
-	else if (request.command == "USER")
-	{
-		changeUsername(request.argument);
-		return;
-	}
-	else if (request.command == "PRIVMSG")
-	{
-		sendToUser(request.argument,request.message);
-		return;
-	}
-	else if (request.command.empty() && !request.argument.empty() && this->_channel != NULL)
-	{
-		sendToAll(request.argument);
-		return;
-	}
+	// else if (request.command.empty() && !request.argument.empty() && this->_channel != NULL)
+	// {
+		// return;
+	// }
 }
