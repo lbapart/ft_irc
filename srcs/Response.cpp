@@ -34,6 +34,12 @@ const std::string&	Response::ERRconnectionFailed(const std::string& nickname)
 	return response;
 }
 
+const std::string&	ERRconnectionInvalidPassword(const std::string& nickname)
+{
+	std::string response = ":" + std::string(SERVER_NAME) + " 464 " + nickname + " :Invalid password\r\n";
+	return response;
+}
+
 const std::string&	Response::OKjoinSuccess(const std::string& nickname, const std::string& channel)
 {
 	std::string response = ":" + nickname + "!" + std::string(SERVER_NAME) + "@localhost JOIN " + channel + "\r\n";
