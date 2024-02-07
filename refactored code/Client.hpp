@@ -8,15 +8,20 @@
 # include "General.hpp"
 
 class Channel;
+class Server;
 
 class Client
 {
 	private:
-		int								_socket;
+		int								iSocket;
+		std::string                     sSocket;
 		std::string 					_username;
+		std::string						_oldUsername;
 		std::string						_nickname;
+		std::string			            _oldNickname;
 		std::string						_password;
 		Channel*						_channel;
+		Server*							_server;
 	public:
 		Client(struct newConnection& newClient);
 		~Client();
@@ -24,24 +29,30 @@ class Client
 		void changeNickname(const std::string& newNickname);
 		void changeUsername(const std::string& newUsername);
 		//channel commands
-		void kick(const std::string& channel, const std::string& nickname);
-		void invite(const std::string& nickname, const std::string& channel);
-		void topic(const std::string& channel, const std::string& topic);
 		void join(const std::string& channel, const std::string& password);
-		void leave(const std::string& channel);
+		void leave();
+		void kick(const std::string& nickname);
+		void invite(const std::string& nickname);
+		void topic(const std::string& topic);
 		//mode commands
-		void modeHandler(const std::string& mode);
-		void modeI(const std::string& user);
-		void modeT(const std::string& mode);
-		void modeK(const std::string& mode);
-		void modeO(const std::string& mode);
-		void modeL(const std::string& mode);
+		void modeHandler(const std::string& modeFlag, const std::string& nickname);
+		void modeI();
+		void modeT();
+		void modeK();
+		void modeO(const std::string& nickname);
+		void modeL(const std::string& limit);
 		//message commands
-		void send(const std::string& channel, const std::string& message);
+		void sendToAll(const std::string& message);
+		void sendToUser(const std::string& nickname, const std::string& message);
 		//accessors
-		int getSocket() const;
+		int getISocket() const;
+		std::string getSSocket() const;
+		std::string getUsername() const;
+		std::string getOldUsername() const;
 		std::string getNickname() const;
+		std::string getOldNickname() const;
 		std::string getPassword() const;
+		void setServer(Server* server);
 };
 
 

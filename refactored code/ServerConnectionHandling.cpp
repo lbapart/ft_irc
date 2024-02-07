@@ -37,9 +37,10 @@ void	Server::clientConnected()
 	//if the client is authentificated, add the client to the list of clients
 	this->_fds.push_back({fd, POLLIN, 0});
 	Client validatedClient(newClient);
-	this->_clients[newClient.sSocket] = validatedClient; */
+	validatedClient.setServer(this);
+	this->_clients[newClient.sSocket] = validatedClient;
 	std::cout << fd << std::endl;
-	std::cout << "New client connected" << std::endl;
+	std::cout << "New client connected" << std::endl; */
 	//response to the client about the connection
 	std::string response = "Welcome to the server created by Vfrants, Aapenko and Rkurnava \r\n";
 	sendResponse(fd, response);

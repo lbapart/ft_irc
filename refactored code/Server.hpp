@@ -75,6 +75,9 @@ class Server
 		void		clientDisconnected(int fd);
 		void		sendResponse(int fd, const std::string& response);
 		int			authentificateConnection(struct newConnection& newClient);
+		
+		std::map<std::string, Channel> getChannels() const;
+		std::map<std::string, Client> getClients() const;
 };
 
 #endif

@@ -59,3 +59,17 @@ const char*	Server::AcceptException::what() const throw()
 {
 	return "Socket accept failure";
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+//Accessors
+
+std::map<std::string, Channel> Server::getChannels() const
+{
+	return this->_channels;
+}
+
+std::map<std::string, Client> Server::getClients() const
+{
+	return this->_clients;
+}
