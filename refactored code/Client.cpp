@@ -9,13 +9,16 @@ Client::Client(struct newConnection& newClient)
 	this->_username = newClient._userName;
 	this->_nickname = newClient._nickName;
 	this->_password = newClient._password;
+	this->_channel = NULL;
 }
 
 Client::~Client()
 {
 }
 
-// Methods
+//////////////////////////////////////////////////////////////////////////////////////////
+
+// Accessors
 
 int Client::getSocket() const
 {
@@ -30,4 +33,13 @@ std::string Client::getNickname() const
 std::string Client::getPassword() const
 {
 	return this->_password;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+// Command Handler
+
+void Client::commandHandler(request & request)
+{
+	
 }

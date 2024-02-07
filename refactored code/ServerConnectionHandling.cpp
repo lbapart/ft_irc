@@ -29,11 +29,12 @@ void	Server::clientConnected()
 	buffer[bytesRead] = 0;
 	std::cout << "DATA READ FROM THE FIRST CLIENT:" << std::endl;
 	std::cout << buffer << std::endl;
-	//TODO: parse the data from the client
+	//TODO: parse the data from the client into the newConnection struct
 	//// function to parse the data from the client to be added here
 	//TODO: authentificate the client
 /* 	if (authentificateConnection(newClient))
 		return(clientDisconnected(fd));
+	//if the client is authentificated, add the client to the list of clients
 	this->_fds.push_back({fd, POLLIN, 0});
 	Client validatedClient(newClient);
 	this->_clients[newClient.sSocket] = validatedClient; */
