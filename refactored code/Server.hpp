@@ -35,7 +35,7 @@ class Server
 		struct sockaddr_in					_addr;
 		std::vector<pollfd>					_fds;
 		std::map<std::string, Channel>		_channels;
-		std::map<std::string, Client>		_clients;
+		std::map<int, Client>				_clients;
 	public:
 		class SocketCreationException : public std::exception
 		{
@@ -75,9 +75,12 @@ class Server
 		void		clientDisconnected(int fd);
 		void		sendResponse(int fd, const std::string& response);
 		int			authentificateConnection(struct newConnection& newClient);
+		void		createChannel(const std::string& name, const std::string& password, Client& client);
 		
-		std::map<std::string, Channel> getChannels() const;
-		std::map<std::string, Client> getClients() const;
+		std::map<std::string, Channel>&			getChannels();
+		std::map<int, Client>&					getClients();
+		Client&									getClient(int fd);
+		int										getClientIdByNickname(const std::string& nickname);
 };
 
 #endif

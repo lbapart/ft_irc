@@ -2,15 +2,16 @@
 #include "Channel.hpp"
 #include "Server.hpp"
 
+//TODO: refactor response messages
 void Client::join(const std::string& channel, const std::string& password)
 {
     std::map<std::string, Channel>::iterator _channel = this->_server->getChannels().find(channel);
     if (_channel == this->_server->getChannels().end())
     {
-        this->_server->sendResponse(this->iSocket, "403 " + channel + " :No such channel");
+		this->_server->createChannel(channel, password, *this);
         return;
     }
-    if (_channel->second.isInviteOnly() && _channel->second.getClients().find(this->_nickname) == _channel->second.getClients().end())
+    if (_channel->second.isInviteOnly() && _channel->second.getClients().find(this->iSocket) == _channel->second.getClients().end())
     {
         this->_server->sendResponse(this->iSocket, "473 " + channel + " :Cannot join channel (+i)");
         return;

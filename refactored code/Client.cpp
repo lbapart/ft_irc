@@ -4,6 +4,11 @@
 
 // Constructor && Destructor
 
+Client::Client()
+{
+	;
+}
+
 Client::Client(struct newConnection& newClient)
 {
 	this->iSocket = newClient.iSocket;
@@ -59,9 +64,14 @@ std::string Client::getPassword() const
 	return this->_password;
 }
 
-void Client::setServer(Server* server)
+void Client::setServer(Server& server)
 {
-	this->_server = server;
+	this->_server = &server;
+}
+
+Server& Client::getServer()
+{
+	return *this->_server;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -81,6 +91,6 @@ void Client::commandHandler(request & request)
 		case (NICK): changeNickname(request.argument);					break;
 		case (USER): changeUsername(request.argument);					break;
 		case (PRIVMSG): sendToUser(request.argument, request.message);	break;
-		default: sendToAll(request.message);
+		default: sendToChannel(request.message);
 	}
 }

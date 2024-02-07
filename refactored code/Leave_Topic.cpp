@@ -2,6 +2,7 @@
 #include "Channel.hpp"
 #include "Server.hpp"
 
+//TODO: refactor response messages
 void Client::leave()
 {
     if (this->_channel == NULL)
@@ -21,7 +22,7 @@ void Client::topic(const std::string& topic)
         this->_server->sendResponse(this->iSocket, "442 :You're not in a channel");
         return;
     }
-    if (this->_channel->isTopicOperatorProtected() && this->_channel->getOperators().find(this->_nickname) == this->_channel->getOperators().end())
+    if (this->_channel->isTopicOperatorProtected() && this->_channel->getOperators().find(this->iSocket) == this->_channel->getOperators().end())
     {
         this->_server->sendResponse(this->iSocket, "482 " + this->_channel->getName() + " :You're not a channel operator");
         return;

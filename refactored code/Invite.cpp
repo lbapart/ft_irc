@@ -9,7 +9,7 @@ void Client::invite(const std::string &nickname)
         this->_server->sendResponse(this->iSocket, "442 :You're not in a channel");
         return;
     }
-    std::map<std::string, Client>::iterator _client = this->_server->getClients().find(nickname);
+    std::map<int, Client>::iterator _client = this->_server->getClients().find(this->iSocket);
     if (_client == this->_server->getClients().end())
     {
         this->_server->sendResponse(this->iSocket, "401 " + nickname + " :No such nickname");

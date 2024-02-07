@@ -23,6 +23,7 @@ class Client
 		Channel*						_channel;
 		Server*							_server;
 	public:
+		Client();
 		Client(struct newConnection& newClient);
 		~Client();
 		void commandHandler(struct request& request);
@@ -42,7 +43,7 @@ class Client
 		void modeO(const std::string& nickname);
 		void modeL(const std::string& limit);
 		//message commands
-		void sendToAll(const std::string& message);
+		void sendToChannel(const std::string& message);
 		void sendToUser(const std::string& nickname, const std::string& message);
 		//accessors
 		int getISocket() const;
@@ -52,7 +53,8 @@ class Client
 		std::string getNickname() const;
 		std::string getOldNickname() const;
 		std::string getPassword() const;
-		void setServer(Server* server);
+		void setServer(Server& server);
+		Server&		getServer();
 };
 
 

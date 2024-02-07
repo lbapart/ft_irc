@@ -1,5 +1,6 @@
 #include "Channel.hpp"
 #include "Client.hpp"
+#include "Server.hpp"
 
 
 Channel::Channel(const std::string& name, const std::string& password, Client& client)
@@ -14,8 +15,9 @@ Channel::Channel(const std::string& name, const std::string& password, Client& c
 	this->_topic = "";
 	this->_topicOperatorProtected = false;
 	this->_userLimit = -1;
-	this->_clients[client.getISocket()] = client;
-	this->_operators[client.getISocket()] = client;
+	this->_clients.insert(client.getISocket());
+	this->_operators.insert(client.getISocket());
+	this->_server = &client.getServer();
 }
 
 Channel::~Channel()
@@ -51,12 +53,12 @@ const std::string& Channel::getPassword() const
 	return this->_password;
 }
 
-std::map<int, Client>& Channel::getClients()
+std::set<int>& Channel::getClients()
 {
 	return this->_clients;
 }
 
-std::map<int, Client>& Channel::getOperators()
+std::set<int>& Channel::getOperators()
 {
 	return this->_operators;
 }
@@ -69,11 +71,13 @@ const std::string& Channel::getTopic() const
 
 const std::string& Channel::getClientsList()
 {
-	std::string list;
+	std::string	list;
+	Client		client;
 
-	for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+	for (std::set<int>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 	{
-		list += it->second.getNickname() + " ";
+		client = this->_server->getClient(*it);
+		list += client.getNickname() + " ";
 	}
 	//TODO: check if it works
 	list.pop_back();
@@ -114,7 +118,7 @@ void Channel::setInviteOnly(bool inviteOnly)
 
 void Channel::addClient(Client & client)
 {
-	this->_clients[client.getISocket()] = client;
+	this->_clients.insert(client.getISocket());
 }
 
 void Channel::removeClient(Client & client)
@@ -124,7 +128,7 @@ void Channel::removeClient(Client & client)
 
 void Channel::addOperator(Client & client)
 {
-	this->_operators[client.getISocket()] = client;
+	this->_operators.insert(client.getISocket());
 }
 
 void Channel::removeOperator(Client & client)

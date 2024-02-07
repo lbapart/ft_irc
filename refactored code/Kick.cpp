@@ -4,23 +4,30 @@
 
 void Client::kick(const std::string & nickname)
 {
+
     if (this->_channel == NULL)
     {
         this->_server->sendResponse(this->iSocket, "442 :You're not in a channel");
         return;
     }
-    std::map<std::string, Client>::iterator Operator = this->_channel->getOperators().find(this->_nickname);
-    if (Operator == this->_channel->getOperators().end())
-    {
-        this->_server->sendResponse(this->iSocket, "482 " + this->_channel->getName() + " :You're not a channel operator");
-        return;
-    }
-    std::map<std::string, Client>::iterator _client = this->_server->getClients().find(nickname);
-    if (_client == this->_server->getClients().end())
-    {
-        this->_server->sendResponse(this->iSocket, "401 " + nickname + " :No such nickname");
-        return;
-    }
-    this->_channel->removeClient(_client->second);
-    this->_server->sendResponse(this->iSocket, "KICK " + this->_channel->getName() + " " + nickname);
+    if (this->_channel->getOperators().count(this->iSocket) == 0)
+	{
+		this->_server->sendResponse(this->iSocket, "482 " + this->_channel->getName() + " :You're not a channel operator");
+		return;
+	}
+
+	int fd = this->_server->getClientIdByNickname(nickname);
+	//TODO: refactor this
+	if (fd > 0)
+	{
+		if (this->_channel->getClients().count(fd) > 0)
+		{
+			this->_channel->removeClient(this->_server->getClients()[fd]);
+			this->_channel->removeOperator(this->_server->getClients()[fd]);
+			this->_server->sendResponse(fd, "KICK " + this->_channel->getName() + " " + nickname + " :You have been kicked from the channel");
+			this->_server->sendResponse(this->iSocket, "KICK " + this->_channel->getName() + " " + nickname + " :You have kicked " + nickname + " from the channel");
+			return;
+		}
+	}
+	this->_server->sendResponse(this->iSocket, "441 " + nickname + " " + this->_channel->getName() + " :They aren't on that channel");
 }

@@ -3,11 +3,12 @@
 
 # include <iostream>
 # include <string>
-# include <map>
+# include <set>
 
 # include "General.hpp"
 
 class Client;
+class Server;
 
 class Channel
 {
@@ -19,8 +20,10 @@ class Channel
 		bool 								_passwordProtected;
 		bool 								_inviteOnly;
 		bool								_topicOperatorProtected;
-		std::map<int, Client>		_clients;
-		std::map<int, Client>		_operators;
+		std::set<int>						_clients;
+		std::set<int>						_operators;
+		Server*								_server;
+
 	public:
 		Channel(const std::string& name, const std::string& password, Client& client);
 		~Channel();
@@ -33,8 +36,8 @@ class Channel
 		const std::string&					getTopic() const;
 		const std::string&					getClientsList();
 		int 								getUserLimit() const;
-		std::map<int, Client>&				getClients();
-		std::map<int, Client>&				getOperators();
+		std::set<int>&						getClients();
+		std::set<int>&						getOperators();
 		// Setters	
 		void								setLimit(int limit);
 		void								setTopic(const std::string& topic);

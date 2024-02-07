@@ -64,12 +64,27 @@ const char*	Server::AcceptException::what() const throw()
 
 //Accessors
 
-std::map<std::string, Channel> Server::getChannels() const
+std::map<std::string, Channel>& Server::getChannels()
 {
 	return this->_channels;
 }
 
-std::map<std::string, Client> Server::getClients() const
+std::map<int, Client>&			Server::getClients()
 {
 	return this->_clients;
+}
+
+Client&							Server::getClient(int fd)
+{
+	return this->_clients[fd];
+}
+
+int								Server::getClientIdByNickname(const std::string& nickname)
+{
+	for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+	{
+		if (it->second.getNickname() == nickname)
+			return it->first;
+	}
+	return -1;
 }

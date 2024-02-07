@@ -10,7 +10,7 @@ void Client::modeHandler(const std::string & modeFlag, const std::string & argum
         this->_server->sendResponse(this->iSocket, "442 :You're not in a channel");
         return;
     }
-    if (this->_channel->getOperators().find(this->_nickname) == this->_channel->getOperators().end())
+    if (this->_channel->getOperators().find(this->iSocket) == this->_channel->getOperators().end())
     {
         this->_server->sendResponse(this->iSocket, "482 " + this->_channel->getName() + " :You're not a channel operator");
         return;
@@ -78,14 +78,14 @@ void Client::modeL(const std::string& limit)
 
 void Client::modeO(const std::string& nickname)
 {
-    std::map<std::string, Client>::iterator _client = this->_channel->getClients().find(nickname);
-    if (_client == this->_channel->getClients().end())
+	int fd = this->_server->getClientIdByNickname(nickname);
+    if (this->_channel->getClients().count(fd) == 0)
     {
         this->_server->sendResponse(this->iSocket, "441 " + nickname + " :They aren't on that channel");
         return;
     }
-    if(this->_channel->getOperators().find(nickname) == this->_channel->getOperators().end())
-        this->_channel->addOperator(_client->second);
+    if (this->_channel->getOperators().count(fd) == 0)
+        this->_channel->addOperator(_server->getClient(fd));
     else
-        this->_channel->removeOperator(_client->second);
+        this->_channel->removeOperator(_server->getClient(fd));
 }
