@@ -2,7 +2,7 @@
 #include "Client.hpp"
 
 
-Channel::Channel(std::string name, const std::string& password)
+Channel::Channel(const std::string& name, const std::string& password, Client& client)
 {
 	this->_name = name;
 	this->_password = password;
@@ -14,10 +14,14 @@ Channel::Channel(std::string name, const std::string& password)
 	this->_topic = "";
 	this->_topicOperatorProtected = false;
 	this->_userLimit = -1;
+	this->_clients[client.getISocket()] = client;
+	this->_operators[client.getISocket()] = client;
 }
 
 Channel::~Channel()
 {
+	_clients.clear();
+	_operators.clear();
 }
 
 // Accessors
@@ -37,45 +41,49 @@ bool Channel::isTopicOperatorProtected() const
 	return this->_topicOperatorProtected;
 }
 
-std::string Channel::getName() const
+const std::string& Channel::getName() const
 {
 	return this->_name;
 }
 
-std::string Channel::getPassword() const
+const std::string& Channel::getPassword() const
 {
 	return this->_password;
 }
 
-std::map<std::string, Client>& Channel::getClients()
+std::map<int, Client>& Channel::getClients()
 {
 	return this->_clients;
 }
 
-std::map<std::string, Client>& Channel::getOperators()
+std::map<int, Client>& Channel::getOperators()
 {
 	return this->_operators;
 }
 
-std::string Channel::getTopic() const
+const std::string& Channel::getTopic() const
 {
 	return this->_topic;
 }
 
 
-std::string Channel::getClientsList()
+const std::string& Channel::getClientsList()
 {
 	std::string list;
-	std::map<std::string, Client>::iterator it = this->_clients.begin();
-	while (it != this->_clients.end())
+
+	for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 	{
-		list += it->first + " ";
-		it++;
+		list += it->second.getNickname() + " ";
 	}
+	//TODO: check if it works
+	list.pop_back();
 	return list;
 }
 
-
+int 				Channel::getUserLimit() const
+{
+	return this->_userLimit;
+}
 
 // Setters
 
@@ -106,22 +114,22 @@ void Channel::setInviteOnly(bool inviteOnly)
 
 void Channel::addClient(Client & client)
 {
-	this->_clients[client.getNickname()] = client;
+	this->_clients[client.getISocket()] = client;
 }
 
 void Channel::removeClient(Client & client)
 {
-	this->_clients.erase(client.getNickname());
+	this->_clients.erase(client.getISocket());
 }
 
 void Channel::addOperator(Client & client)
 {
-	this->_operators[client.getNickname()] = client;
+	this->_operators[client.getISocket()] = client;
 }
 
 void Channel::removeOperator(Client & client)
 {
-	this->_operators.erase(client.getNickname());
+	this->_operators.erase(client.getISocket());
 }
 
 void Channel::setLimit(int limit)
