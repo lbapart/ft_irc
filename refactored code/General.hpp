@@ -23,15 +23,11 @@ typedef enum e_command
     PART,
     USER,
     TOPIC,
-    NAMES,
     PRIVMSG,
     JOIN,
     KICK,
     QUIT,
-    LIST,
-    OPERATOR,
     INVITE,
-    UNKNOWN,
     LEAVE
 } t_command;
 

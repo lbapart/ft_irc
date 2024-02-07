@@ -4,6 +4,8 @@
 
 void Client::sendToAll(const std::string &message)
 {
+    if (this->_channel == NULL)
+        return;
     std::map<std::string, Client>::iterator it = this->_server->getClients().begin();
     while (it != this->_server->getClients().end())
     {

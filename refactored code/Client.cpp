@@ -81,10 +81,6 @@ void Client::commandHandler(request & request)
 		case (NICK): changeNickname(request.argument);					break;
 		case (USER): changeUsername(request.argument);					break;
 		case (PRIVMSG): sendToUser(request.argument, request.message);	break;
-		default: sendToAll(request.argument);
+		default: sendToAll(request.message);
 	}
-	// else if (request.command.empty() && !request.argument.empty() && this->_channel != NULL)
-	// {
-		// return;
-	// }
 }
