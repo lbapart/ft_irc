@@ -5,6 +5,7 @@
 # define SUCCESS 0
 
 #include <string>
+#include "Response.hpp"
 
 struct newConnection
 {
