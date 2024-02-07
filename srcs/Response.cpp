@@ -34,7 +34,7 @@ const std::string&	Response::ERRconnectionFailed(const std::string& nickname)
 	return response;
 }
 
-const std::string&	ERRconnectionInvalidPassword(const std::string& nickname)
+const std::string&	Response::ERRconnectionInvalidPassword(const std::string& nickname)
 {
 	std::string response = ":" + std::string(SERVER_NAME) + " 464 " + nickname + " :Invalid password\r\n";
 	return response;
