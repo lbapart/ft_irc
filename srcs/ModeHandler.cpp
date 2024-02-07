@@ -1,6 +1,4 @@
-#include "Client.hpp"
-#include "Channel.hpp"
-#include "Server.hpp"
+#include "General.hpp"
 
 
 void Client::modeHandler(const std::string & modeFlag, const std::string & arguments)

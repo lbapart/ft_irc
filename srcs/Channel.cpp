@@ -1,6 +1,4 @@
-#include "Channel.hpp"
-#include "Client.hpp"
-#include "Server.hpp"
+#include "General.hpp"
 
 
 Channel::Channel(const std::string& name, const std::string& password, Client& client)

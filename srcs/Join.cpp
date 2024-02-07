@@ -1,6 +1,4 @@
-#include "Client.hpp"
-#include "Channel.hpp"
-#include "Server.hpp"
+#include "General.hpp"
 
 //TODO: refactor response messages
 void Client::join(const std::string& channel, const std::string& password)

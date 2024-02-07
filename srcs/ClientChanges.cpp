@@ -1,4 +1,4 @@
-#include "Client.hpp"
+#include "General.hpp"
 
 void Client::changeNickname(const std::string& newNickname)
 {
