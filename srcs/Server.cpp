@@ -16,7 +16,12 @@ Server::Server(ushort port, const std::string& password)
 	if (setsockopt(this->_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
 		throw SocketCreationException();
 	this->_password = password;
-	this->_fds.push_back({this->_socket, POLLIN, 0});
+
+	struct pollfd pfd;
+	pfd.fd = this->_socket;
+	pfd.events = POLLIN;
+	pfd.revents = 0;
+	this->_fds.push_back(pfd);
 	this->_addr.sin_family = AF_INET;
 	this->_addr.sin_port = htons(this->_port);
 	this->_addr.sin_addr.s_addr = INADDR_ANY;
@@ -87,4 +92,9 @@ int								Server::getClientIdByNickname(const std::string& nickname)
 			return it->first;
 	}
 	return -1;
+}
+
+void		Server::createChannel(const std::string& name, const std::string& password, Client& client)
+{
+	this->_channels.insert(std::pair<std::string, Channel>(name, Channel(name, password, client)));
 }

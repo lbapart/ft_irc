@@ -34,7 +34,7 @@ class Channel
 		const std::string&					getPassword() const;
 		const std::string&					getName() const;
 		const std::string&					getTopic() const;
-		const std::string&					getClientsList();
+		const std::string					getClientsList();
 		int 								getUserLimit() const;
 		std::set<int>&						getClients();
 		std::set<int>&						getOperators();

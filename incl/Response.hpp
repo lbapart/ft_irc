@@ -40,11 +40,11 @@ class Response
 		// Successful message, takes nickname, channel and message as arguments (const std::string& nickname, const std::string& message)
 		static const std::string	OKmessageSuccess(const std::string& nickname, const std::string& channel, const std::string& message);
 		// Failed message, takes nickname, channel and message as arguments (const std::string& nickname, const std::string& message)
-		static const std::string	ERRmessageFailed(const std::string& nickname, const std::string& channel, const std::string& message);
+		static const std::string	ERRmessageFailed(const std::string& nickname, const std::string& channel);
 		// Successful private message, takes nicknames (sender, receiver) and message as arguments (const std::string& sender, const std::string& receiver  ,const std::string& message)
 		static const std::string	OKprivateMessageSuccess(const std::string& sender, const std::string& receiver, const std::string& message);
 		// Failed private message, takes nicknames (sender, receiver) and message as arguments (const std::string& sender, const std::string& receiver  ,const std::string& message)
-		static const std::string	ERRprivateMessageFailed(const std::string& sender, const std::string& receiver, const std::string& message);
+		static const std::string	ERRprivateMessageFailed(const std::string& sender, const std::string& receiver);
 
 		// Invite
 		// Successful invite, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)

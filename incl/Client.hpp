@@ -7,8 +7,9 @@
 
 # include "General.hpp"
 
-class Channel;
 class Server;
+class Channel;
+
 
 class Client
 {

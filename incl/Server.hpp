@@ -17,14 +17,15 @@
 # include <sstream>
 # include <iomanip>
 # include <ctime>
-# include <chrono>
+//# include <chrono>
 # include <limits>
 
 # include <cerrno>
 
 # include "General.hpp"
-# include "Channel.hpp"
-# include "Client.hpp"
+
+class Client;
+class Channel;
 
 class Server
 {

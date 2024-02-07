@@ -6,6 +6,9 @@
 
 #include <string>
 #include "Response.hpp"
+#include "Server.hpp"
+#include "Client.hpp"
+#include "Channel.hpp"
 
 struct newConnection
 {

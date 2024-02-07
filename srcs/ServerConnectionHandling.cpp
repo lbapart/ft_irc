@@ -50,5 +50,11 @@ void	Server::clientDisconnected(int fd)
 {
 	std::cout << "Client fd erased" << std::endl;
 	close(fd);
-	this->_fds.erase(std::remove_if(this->_fds.begin(), this->_fds.end(), [fd](const pollfd& pfd) { return pfd.fd == fd; }), this->_fds.end());
+	for (std::vector<pollfd>::iterator it = this->_fds.begin(); it != this->_fds.end(); )
+	{
+    	if (it->fd == fd)
+        	it = this->_fds.erase(it);
+    	else
+        	++it;
+	}
 }

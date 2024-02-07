@@ -4,8 +4,11 @@ RM			= rm -rf
 
 CXXFLAGS	= -Wall -Wextra -Werror -MD -MP -std=c++98
 
+INCLUDES	= -I./incl
 SRCS_DIR	= srcs
-SRCS	= ${SRCS_DIR}/main.cpp
+#SRCS	= ${SRCS_DIR}/main.cpp
+
+SRCS		= $(wildcard $(SRCS_DIR)/*.cpp)
 
 OBJS_DIR	= objs
 OBJS	= $(addprefix $(OBJS_DIR)/, $(SRCS:.cpp=.o))
@@ -22,7 +25,7 @@ $(NAME)	: $(OBJS)
 
 objs/%.o: %.cpp
 		@mkdir -p $(dir $@)
-		${CXX} ${CXXFLAGS} -c $< -o $@
+		${CXX} ${CXXFLAGS} ${INCLUDES} -c $< -o $@
 
 clean	:
 		$(RM) $(OBJS_DIR)

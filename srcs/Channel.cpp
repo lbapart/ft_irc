@@ -69,7 +69,7 @@ const std::string& Channel::getTopic() const
 }
 
 
-const std::string& Channel::getClientsList()
+const std::string	Channel::getClientsList()
 {
 	std::string	list;
 	Client		client;
@@ -79,8 +79,8 @@ const std::string& Channel::getClientsList()
 		client = this->_server->getClient(*it);
 		list += client.getNickname() + " ";
 	}
-	//TODO: check if it works
-	list.pop_back();
+	// TODO: remove last space
+	// list.pop_back();
 	return list;
 }
 

@@ -82,7 +82,7 @@ const std::string	Response::OKmessageSuccess(const std::string& nickname, const 
 	return response;
 }
 
-const std::string	Response::ERRmessageFailed(const std::string& nickname, const std::string& channel, const std::string& message)
+const std::string	Response::ERRmessageFailed(const std::string& nickname, const std::string& channel)
 {
 	std::string response = ":" + std::string(SERVER_NAME) + " 404 " + nickname + " " + channel + " :Cannot send to channel\r\n";
 	return response;
@@ -94,7 +94,7 @@ const std::string	Response::OKprivateMessageSuccess(const std::string& sender, c
 	return response;
 }
 
-const std::string	Response::ERRprivateMessageFailed(const std::string& sender, const std::string& receiver, const std::string& message)
+const std::string	Response::ERRprivateMessageFailed(const std::string& sender, const std::string& receiver)
 {
 	std::string response = ":" + std::string(SERVER_NAME) + " 401 " + sender + " " + receiver + " :No such nick/channel\r\n";
 	return response;

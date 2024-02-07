@@ -35,7 +35,7 @@ std::string	Server::getClientMessage(int fd)
 void		Server::sendResponse(int fd, const std::string& response)
 {
 	int bytesSent = 0;
-	while (bytesSent < response.size())
+	while (bytesSent < (int)response.size())
 	{
 		int sent = send(fd, response.c_str() + bytesSent, response.size() - bytesSent, 0);
 		if (sent == -1)
