@@ -1,7 +1,6 @@
 #include "Server.hpp"
 #include <vector>
 
-int	parseLine( t_request &req, const std::string &line, int fd );
 
 int	Server::getClientMessage(int fd, std::string &message)
 {
@@ -30,7 +29,7 @@ int	Server::getClientMessage(int fd, std::string &message)
 	}
 
 	t_request _req;
-	int status = parseLine(_req, buffer, fd);
+	int status = parseLines(_req, buffer, fd);
 	// std::cout << "BUFFER: " << buffer << std::endl;
 	message = buffer;
 	std::string response = ":server 001 aapenko :Welcome to the server\r\n";

@@ -48,4 +48,6 @@ typedef struct request
                         //or with -l flag, the limit of the channel
 }   t_request;
 
+int parseLines( t_request &req, const std::string &line, int fd );
+
 #endif
