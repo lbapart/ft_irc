@@ -21,11 +21,14 @@ void Client::kick(const std::string & nickname)
 		{
 			this->_channel->removeClient(this->_server->getClients()[fd]);
 			this->_channel->removeOperator(this->_server->getClients()[fd]);
-			//TODO: kick message for a client
-			this->_server->sendResponse(fd, "KICK " + this->_channel->getName() + " " + nickname + " :You have been kicked from the channel");
 			this->_server->sendResponse(this->iSocket, Response::OKkickSuccess(nickname, this->_channel->getName()));
+			this->_server->sendResponse(fd, Response::YouWereKicked(nickname, this->_channel->getName()));
+			for (std::set<int>::iterator it = this->_channel->getClients().begin(); it != this->_channel->getClients().end(); ++it)
+			{
+				this->_server->sendResponse(*it, Response::UserLeftChannel(nickname, this->_channel->getName()));
+			}
 			return;
 		}
 	}
-	this->_server->sendResponse(this->iSocket, "441 " + nickname + " " + this->_channel->getName() + " :They aren't on that channel");
+	this->_server->sendResponse(this->iSocket, Response::ERRkickFailed(nickname, this->_channel->getName()));
 }

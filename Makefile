@@ -2,7 +2,7 @@ CXX			= c++
 NAME		= ircserv
 RM			= rm -rf
 
-CXXFLAGS	= -Wall -Wextra -Werror -MD -MP -std=c++98
+CXXFLAGS	= -Wall -Wextra -Werror -MD -MP -std=c++98 -pedantic
 
 INCLUDES	= -I./incl
 SRCS_DIR	= srcs

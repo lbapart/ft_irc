@@ -87,6 +87,10 @@ class Response
 		static const std::string	OKunsetInvateOnlyModeSuccess(const std::string& nickname, const std::string& channel);
 		// Failed unset invite only mode, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
 		static const std::string	ERRunsetInvateOnlyModeFailed(const std::string& nickname, const std::string& channel);
+		// Successful set channel topic, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
+		static const std::string	OKsetChannelTopic(const std::string& nickname, const std::string& channel);
+		// Failed set channel topic, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
+		static const std::string	ERRsetChannelTopic(const std::string& nickname, const std::string& channel);
 
 		// Successful set topic restricted, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
 		static const std::string	OKsetTopicRestrictedSuccess(const std::string& nickname, const std::string& channel);
@@ -107,9 +111,23 @@ class Response
 		// Failed take operator status, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
 		static const std::string	ERRtakeOperatorStatusFailed(const std::string& nickname, const std::string& channel);
 
+		// Set mode
+		// Successful set mode, takes nickname and mode as arguments (const std::string& nickname, const std::string& mode)
+		static const std::string	OKsetModeSuccess(const std::string& nickname, const std::string& mode);
+		// Failed set mode, takes nickname and mode as arguments (const std::string& nickname, const std::string& mode)
+		static const std::string	ERRsetModeFailed(const std::string& nickname, const std::string& mode);
+
 		// Unkown command
 		// Failed unknown command, takes nickname and command as arguments (const std::string& nickname, const std::string& command)
 		static const std::string	ERRunknownCommand(const std::string& nickname, const std::string& command);
+
+		// channel messages
+		static const std::string	UserJoinedChannel(const std::string& nickname, const std::string& channel);
+		static const std::string	UserLeftChannel(const std::string& nickname, const std::string& channel);
+		static const std::string	YouWereKicked(const std::string& nickname, const std::string& channel);
+		static const std::string	TopicSet(const std::string& nickname, const std::string& channel, const std::string& topic);
+		static const std::string	MessageToChannel(const std::string& nickname, const std::string& channel, const std::string& message);
+		static const std::string	MessageToUser(const std::string& nickname, const std::string& message);
 };
 
 #endif

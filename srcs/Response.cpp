@@ -249,3 +249,63 @@ const std::string	Response::ERRunknownCommand(const std::string& nickname, const
 	std::string response = ":" + std::string(SERVER_NAME) + " 421 " + nickname + " " + command + " :Unknown command\r\n";
 	return response;
 }
+
+const std::string	Response::UserJoinedChannel(const std::string& nickname, const std::string& channel)
+{
+	std::string response = ":" + nickname + "!" + std::string(SERVER_NAME) + "@localhost JOIN " + channel + "\r\n";
+	return response;
+}
+
+const std::string	Response::UserLeftChannel(const std::string& nickname, const std::string& channel)
+{
+	std::string response = ":" + nickname + "!" + std::string(SERVER_NAME) + "@localhost PART " + channel + "\r\n";
+	return response;
+}
+
+const std::string	Response::YouWereKicked(const std::string& nickname, const std::string& channel)
+{
+	std::string response = ":" + std::string(SERVER_NAME) + " 441 " + nickname + " " + channel + " :You were kicked\r\n";
+	return response;
+}
+
+const std::string	Response::OKsetChannelTopic(const std::string& nickname, const std::string& channel)
+{
+	std::string response = ":" + std::string(SERVER_NAME) + " 333 " + nickname + " " + channel + " :Topic set successfully\r\n";
+	return response;
+}
+
+const std::string	Response::ERRsetChannelTopic(const std::string& nickname, const std::string& channel)
+{
+	std::string response = ":" + std::string(SERVER_NAME) + " 442 " + nickname + " " + channel + " :Topic set failed\r\n";
+	return response;
+}
+
+const std::string	Response::TopicSet(const std::string& nickname, const std::string& channel, const std::string& topic)
+{
+	std::string response = ":" + std::string(SERVER_NAME) + " 333 " + nickname + " " + channel + " :" + topic + "\r\n";
+	return response;
+}
+
+const std::string	Response::MessageToChannel(const std::string& nickname, const std::string& channel, const std::string& message)
+{
+	std::string response = ":" + nickname + "!" + std::string(SERVER_NAME) + "@localhost PRIVMSG " + channel + " :" + message + "\r\n";
+	return response;
+}
+
+const std::string	Response::MessageToUser(const std::string& nickname, const std::string& message)
+{
+	std::string response = ":" + nickname + "!" + std::string(SERVER_NAME) + "@localhost PRIVMSG " + nickname + " :" + message + "\r\n";
+	return response;
+}
+
+const std::string	Response::OKsetModeSuccess(const std::string& nickname, const std::string& mode)
+{
+	std::string response = ":" + std::string(SERVER_NAME) + " 324 " + nickname + " " + mode + " :Mode set successfully\r\n";
+	return response;
+}
+
+const std::string	Response::ERRsetModeFailed(const std::string& nickname, const std::string& mode)
+{
+	std::string response = ":" + std::string(SERVER_NAME) + " 484 " + nickname + " " + mode + " :Mode set failed\r\n";
+	return response;
+}

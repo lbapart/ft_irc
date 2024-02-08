@@ -77,8 +77,8 @@ const std::string	Channel::getClientsList()
 		client = this->_server->getClient(*it);
 		list += client.getNickname() + " ";
 	}
-	// TODO: remove last space
-	// list.pop_back();
+	if (list.size() > 0)
+		list = std::string(list.begin(), list.end() - 1);
 	return list;
 }
 

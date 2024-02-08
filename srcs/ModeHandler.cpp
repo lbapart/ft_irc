@@ -5,12 +5,12 @@ void Client::modeHandler(const std::string & modeFlag, const std::string & argum
 {
     if (this->_channel == NULL)
     {
-        this->_server->sendResponse(this->iSocket, "442 :You're not in a channel");
+        this->_server->sendResponse(this->iSocket, Response::ERRsetModeFailed(this->getNickname(), ""));
         return;
     }
     if (this->_channel->getOperators().find(this->iSocket) == this->_channel->getOperators().end())
     {
-        this->_server->sendResponse(this->iSocket, "482 " + this->_channel->getName() + " :You're not a channel operator");
+        this->_server->sendResponse(this->iSocket, Response::ERRsetModeFailed(this->getNickname(), this->_channel->getName()));
         return;
     }
     if (modeFlag == "-o" || modeFlag == "-O")
@@ -77,9 +77,9 @@ void Client::modeL(const std::string& limit)
 void Client::modeO(const std::string& nickname)
 {
 	int fd = this->_server->getClientIdByNickname(nickname);
-    if (this->_channel->getClients().count(fd) == 0)
+    if (this->_channel == NULL || this->_channel->getClients().count(fd) == 0)
     {
-        this->_server->sendResponse(this->iSocket, "441 " + nickname + " :They aren't on that channel");
+        this->_server->sendResponse(this->iSocket, Response::ERRsetModeFailed(this->getNickname(), ""));
         return;
     }
     if (this->_channel->getOperators().count(fd) == 0)
