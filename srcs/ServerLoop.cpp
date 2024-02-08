@@ -1,4 +1,5 @@
-#include "Server.hpp"
+#include "../incl/Server.hpp"
+#include <algorithm>
 
 void	Server::run()
 {
@@ -10,34 +11,51 @@ void	Server::run()
 		throw SocketListenException();
 	while (1)
 	{
-		if (poll(this->_fds.data(), this->_fds.size(), -1) == -1)
+		std::vector<pollfd>	temp;
+
+		if (poll(this->_fds.data(), this->_fds.size(), -1) == -1) {
+			std::cerr << "Poll error" << std::endl;
 			throw PollException();
-		for (std::vector<pollfd>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++)
+		}
+
+		std::vector<pollfd>::iterator it = this->_fds.begin();
+		while (it != this->_fds.end())
 		{
-			if (!it->revents)
-				continue;
+			// std::cout << "loop run" << std::endl;
 			if (it->revents & POLLIN)
 			{
-				std::cout << it->fd << std::endl;
+				// std::cout << it->fd << std::endl;
+				// std::cout << "Socket fd = " << this->_socket << std::endl;
 				if (it->fd == this->_socket)
 				{
 					std::cout << "New Client tries to connect!" << std::endl;
-					clientConnected();
-					break;
+					int	fd = clientConnected();
+					if (fd == -1)
+						continue ;
+					temp.push_back({fd, POLLIN | POLLOUT, 0});
 				}
 				else
 				{
-					std::string message = getClientMessage(it->fd);
-					if (message == "/QUIT" || message == "/quit" || message == "/Quit")
-					{
-						clientDisconnected(it->fd);
+					std::cout << "Client sent a message\n" << std::endl;
+					std::string message;
+					int status = getClientMessage(it->fd, message);
+					if (status == -1) {
+						std::cout << "BREAK" << std::endl;
+						break;
 					}
 				}
 			}
-			if (it->revents & POLLHUP)
+			else if (it->revents & POLLOUT)
+			{
+				// std::cout << "Client is ready to receive a message" << std::endl;
+			}
+			else if (it->revents & POLLHUP)
 			{
 				std::cout << "Connection closed" << std::endl;
 			}
+			++it;
 		}
+
+		this->_fds.insert(this->_fds.end(), temp.begin(), temp.end());
 	}
 }

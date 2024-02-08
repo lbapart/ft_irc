@@ -2,9 +2,11 @@ CXX			= c++
 NAME		= ircserv
 RM			= rm -rf
 
-CXXFLAGS	= -Wall -Wextra -Werror -MD -MP -std=c++98
+CXXFLAGS	= -Wall -Wextra -Werror -MD -MP
 
-INCLUDES	= -I./incl
+MAKEFLAGS	= -j$(nproc)
+
+INCLUDES	= -I ./incl
 SRCS_DIR	= srcs
 #SRCS	= ${SRCS_DIR}/main.cpp
 
@@ -33,7 +35,9 @@ clean	:
 fclean	:
 		$(RM) $(OBJS_DIR) $(NAME)
 
-re		: fclean all
+re		:
+		$(RM) $(OBJS_DIR) $(NAME)
+		make all
 
 -include $(DEPS)
 

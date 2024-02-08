@@ -1,35 +1,41 @@
 #include "Server.hpp"
+#include <vector>
 
-std::string	Server::getClientMessage(int fd)
+int	parseLine( t_request &req, const std::string &line, int fd );
+
+int	Server::getClientMessage(int fd, std::string &message)
 {
 	char		buffer[1024];
-	std::string	message;
 
-	std::cout << "Reading message" << std::endl;
-	while (1)
-	{
-		std::memset(buffer, 0, 1024);
-		int bytesRead = recv(fd, buffer, sizeof(buffer), 0);
-		std::cout << bytesRead << std::endl;
-		if (bytesRead == -1)
+	std::memset(buffer, 0, 1024);
+
+	// std::cout << "Client fd" << fd << std::endl;
+	int bytesRead = recv(fd, buffer, 1024, 0);
+	// std::cout << "BYTES READ: " << bytesRead << std::endl;
+	if (bytesRead == -1)
+		std::cerr << "Error reading from client" << std::endl;
+	if (bytesRead <= 0) {
+		this->_clients.erase(fd);
+		for (std::vector<pollfd>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++)
 		{
-			if (errno == EWOULDBLOCK || errno == EAGAIN)
-				continue ;
-			else
-				throw AcceptException();
+			if (it->fd == fd)
+			{
+				this->_fds.erase(it);
+				break ;
+			}
 		}
-		if (bytesRead == 0)
-			break;
-		message.append(buffer);
-		if (std::strstr(buffer, "\n") != NULL)
-			break;
+		// this->_fds.erase(fd);  //TODO: delete client from db -----------------------------
+		close(fd);
+		return (-1);
 	}
-	std::cout << message << std::endl;
-	std::cout << "Message read" << std::endl;
-	std::cout.flush();
+
+	t_request _req;
+	int status = parseLine(_req, buffer, fd);
+	// std::cout << "BUFFER: " << buffer << std::endl;
+	message = buffer;
 	std::string response = ":server 001 aapenko :Welcome to the server\r\n";
 	send(fd, response.c_str(), response.size(), 0);
-	return message;
+	return status;
 }
 
 void		Server::sendResponse(int fd, const std::string& response)

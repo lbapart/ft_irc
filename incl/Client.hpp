@@ -54,6 +54,10 @@ class Client
 		std::string getNickname() const;
 		std::string getOldNickname() const;
 		std::string getPassword() const;
+		void setUsername(const std::string& username);
+		void setNickname(const std::string& nickname);
+		void setPassword(const std::string& password);
+		void setChannel(Channel& channel);
 		void setServer(Server& server);
 		Server&		getServer();
 };

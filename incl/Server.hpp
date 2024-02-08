@@ -41,43 +41,43 @@ class Server
 		class SocketCreationException : public std::exception
 		{
 			public:
-				virtual const char* what() const throw();				
+				virtual const char* what() const throw();
 		};
 		class SocketBindException : public std::exception
 		{
 			public:
-				virtual const char* what() const throw();				
+				virtual const char* what() const throw();
 		};
 		class SocketListenException : public std::exception
 		{
 			public:
-				virtual const char* what() const throw();				
+				virtual const char* what() const throw();
 		};
 		class PollException : public std::exception
 		{
 			public:
-				virtual const char* what() const throw();				
+				virtual const char* what() const throw();
 		};
 		class AcceptException : public std::exception
 		{
 			public:
-				virtual const char* what() const throw();				
+				virtual const char* what() const throw();
 		};
 		class SendException : public std::exception
 		{
 			public:
-				virtual const char* what() const throw();				
+				virtual const char* what() const throw();
 		};
 		Server(ushort port, const std::string& password);
 		~Server();
 		void		run();
-		void		clientConnected();
-		std::string	getClientMessage(int fd);
+		int			clientConnected();
+		int			getClientMessage(int fd, std::string &msg);
 		void		clientDisconnected(int fd);
 		void		sendResponse(int fd, const std::string& response);
 		int			authentificateConnection(struct newConnection& newClient);
 		void		createChannel(const std::string& name, const std::string& password, Client& client);
-		
+
 		std::map<std::string, Channel>&			getChannels();
 		std::map<int, Client>&					getClients();
 		Client&									getClient(int fd);

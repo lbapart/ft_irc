@@ -35,17 +35,17 @@ typedef enum e_command
     LEAVE
 } t_command;
 
-struct request
+typedef struct request
 {
     std::string message; //stores the message sent by the client like private message or channel message to all
     t_command   command; //stores commands like join, mode, leave, etc.
     std::string modeFlag; //stores mode flags like -i, -t, -k, -o, -l
     std::string channelPassword; //stores the password of the channel
-    std::string requestFd; //stores the fd of the client that sent the request
+    int         requestFd; //stores the fd of the client that sent the request
     std::string requestChannel; //stores the channel where the request was made
-    std::string argument; //stores the arguments like name of the channel, nickname 
+    std::string argument; //stores the arguments like name of the channel, nickname
                         //or if the mode is -o set give a user the operator status, the nicname of the user to become operator
                         //or with -l flag, the limit of the channel
-};
+}   t_request;
 
 #endif

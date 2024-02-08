@@ -64,6 +64,27 @@ std::string Client::getPassword() const
 	return this->_password;
 }
 
+void Client::setUsername(const std::string& username)
+{
+	this->_username = username;
+}
+
+void Client::setNickname(const std::string& nickname)
+{
+	this->_nickname = nickname;
+}
+
+void Client::setPassword(const std::string& password)
+{
+	this->_password = password;
+}
+
+void Client::setChannel(Channel& channel)
+{
+	this->_channel = &channel;
+}
+
+
 void Client::setServer(Server& server)
 {
 	this->_server = &server;
