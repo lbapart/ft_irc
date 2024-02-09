@@ -10,10 +10,13 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 
+class Server;
+class Channel;
+class Client;
+
 struct newConnection
 {
-    int iSocket; //stores the socket of the client
-    std::string sSocket; //stores the socket of the client as a string, to be used as a key in the map
+    int _fd; //stores the socket of the client
     std::string _userName; //stores the username of the client
     std::string _nickName; //stores the nickname of the client
     std::string _password; //stores the password of the client

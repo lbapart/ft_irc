@@ -1,142 +1,175 @@
+
 #include "Channel.hpp"
-#include "Client.hpp"
-#include "Server.hpp"
 
+#include <iostream>
 
-Channel::Channel(const std::string& name, const std::string& password, Client& client)
+Channel::Channel() {}
+Channel::Channel( std::string name, std::string password, const int& fd, Server *serv )
 {
 	this->_name = name;
 	this->_password = password;
+	this->_clients.insert(fd);
+	this->_operators.insert(fd);
 	this->_inviteOnly = false;
-	if (password != "")
-		this->_passwordProtected = true;
-	else
-		this->_passwordProtected = false;
-	this->_topic = "";
-	this->_topicOperatorProtected = false;
-	this->_userLimit = -1;
-	this->_clients.insert(client.getISocket());
-	this->_operators.insert(client.getISocket());
-	this->_server = &client.getServer();
+	this->_isTopicRestricted = false;
+	this->_userLimit = 5;
+	this->_server = serv;
 }
+Channel::~Channel() {}
 
-Channel::~Channel()
+std::string	Channel::getName( void ) const
 {
-	_clients.clear();
-	_operators.clear();
+	return (this->_name);
 }
 
-// Accessors
-
-bool Channel::isInviteOnly() const
+void	Channel::setName( const std::string name )
 {
-	return this->_inviteOnly;
+	this->_name = name;
 }
 
-bool Channel::isPasswordProtected() const
+std::string	Channel::getPassword( void ) const
 {
-	return this->_passwordProtected;
+	return (this->_password);
 }
 
-bool Channel::isTopicOperatorProtected() const
-{
-	return this->_topicOperatorProtected;
-}
-
-const std::string& Channel::getName() const
-{
-	return this->_name;
-}
-
-const std::string& Channel::getPassword() const
-{
-	return this->_password;
-}
-
-std::set<int>& Channel::getClients()
-{
-	return this->_clients;
-}
-
-std::set<int>& Channel::getOperators()
-{
-	return this->_operators;
-}
-
-const std::string& Channel::getTopic() const
-{
-	return this->_topic;
-}
-
-
-const std::string	Channel::getClientsList()
-{
-	std::string	list;
-	Client		client;
-
-	for (std::set<int>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
-	{
-		client = this->_server->getClient(*it);
-		list += client.getNickname() + " ";
-	}
-	// TODO: remove last space
-	// list.pop_back();
-	return list;
-}
-
-int 				Channel::getUserLimit() const
-{
-	return this->_userLimit;
-}
-
-// Setters
-
-void Channel::setPassword(const std::string& password)
+void	Channel::setPassword( const std::string password )
 {
 	this->_password = password;
 }
 
-void Channel::setPasswordProtected(bool passwordProtected)
+std::string	Channel::getTopic( void ) const
 {
-	this->_passwordProtected = passwordProtected;
+	return (this->_topic);
 }
 
-void Channel::setTopic(const std::string& topic)
+void	Channel::setTopic( const std::string topic )
 {
 	this->_topic = topic;
 }
 
-void Channel::setTopicOperatorProtected(bool topicOperatorProtected)
+bool	Channel::isInviteOnly( void ) const
 {
-	this->_topicOperatorProtected = topicOperatorProtected;
+	return (this->_inviteOnly);
 }
 
-void Channel::setInviteOnly(bool inviteOnly)
+void	Channel::setInviteOnly( const bool &inviteOnly )
 {
 	this->_inviteOnly = inviteOnly;
 }
 
-void Channel::addClient(Client & client)
+size_t	Channel::getUserLimit( void ) const
 {
-	this->_clients.insert(client.getISocket());
+	return (this->_userLimit);
+
+}
+void	Channel::setUserLimit( const size_t &userLimit )
+{
+	this->_userLimit = userLimit;
 }
 
-void Channel::removeClient(Client & client)
+bool	Channel::isTopicRestricted( void ) const
 {
-	this->_clients.erase(client.getISocket());
+	return (this->_isTopicRestricted);
+
 }
 
-void Channel::addOperator(Client & client)
+void	Channel::setTopicRestricted( const bool &isTopicRestricted )
 {
-	this->_operators.insert(client.getISocket());
+	this->_isTopicRestricted = isTopicRestricted;
 }
 
-void Channel::removeOperator(Client & client)
+
+int		Channel::addClient( const int &fd, const std::string &password )
 {
-	this->_operators.erase(client.getISocket());
+	// if channel is full
+	if (this->_clients.size() >= this->_userLimit)
+		return ERROR;
+	// if channel is invite only
+	if (this->_inviteOnly)
+	{
+		if (this->_invited.count(fd) == 0)
+			return ERROR;
+	}
+	// if user not in channel and is invited or password is correct
+	if (this->_clients.count(fd) == 0 && (this->isInvited(fd) || this->_password == password))
+	{
+		this->_clients.insert(fd);
+		this->removeInvite(fd);
+		return SUCCESS;
+	}
+	return ERROR;
 }
 
-void Channel::setLimit(int limit)
+int		Channel::removeClient( const int &fd )
 {
-	this->_userLimit = limit;
+	if (this->_clients.count(fd) == 1)
+	{
+		this->_clients.erase(fd);
+		this->removeOperator(fd);
+		return SUCCESS;
+	}
+	return ERROR;
+}
+
+bool	Channel::isClient( const int &fd ) const
+{
+	return (this->_clients.count(fd) == 1);
+}
+
+int		Channel::addOperator( const int &fd )
+{
+	if (this->_clients.count(fd) == 1 && this->_operators.count(fd) == 0)
+	{
+		this->_operators.insert(fd);
+		return SUCCESS;
+	}
+	return ERROR;
+}
+
+int		Channel::removeOperator( const int &fd )
+{
+	if (this->_operators.count(fd) == 1)
+	{
+		this->_operators.erase(fd);
+		return SUCCESS;
+	}
+	return ERROR;
+}
+
+bool	Channel::isOperator( const int &fd ) const
+{
+	return (this->_operators.count(fd) == 1);
+}
+
+int 	Channel::addInvite( const int &fd )
+{
+	if (this->_invited.count(fd) == 0)
+	{
+		this->_invited.insert(fd);
+		return SUCCESS;
+	}
+	return ERROR;
+}
+
+int 	Channel::removeInvite( const int &fd )
+{
+	if (this->_invited.count(fd) == 1)
+	{
+		this->_invited.erase(fd);
+		return SUCCESS;
+	}
+	return ERROR;
+}
+
+bool	Channel::isInvited( const int &fd ) const
+{
+	return (this->_invited.count(fd) == 1);
+}
+
+void	Channel::postMessageInChannel( const std::string& nickname, const std::string &message )
+{
+	for (std::set<int>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+	{
+		this->_server->sendResponse(*it, Response::OKmessageSuccess(nickname, this->_name, message));
+	}
 }

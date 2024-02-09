@@ -11,7 +11,7 @@ Server::Server(ushort port, const std::string& password)
 	int flags = fcntl(this->_socket, F_SETFL, O_NONBLOCK);
 	if (flags == -1)
 		throw SocketCreationException();
-	
+
 	int opt = 1;
 	if (setsockopt(this->_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
 		throw SocketCreationException();
@@ -65,36 +65,30 @@ const char*	Server::AcceptException::what() const throw()
 	return "Socket accept failure";
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-
-//Accessors
-
-std::map<std::string, Channel>& Server::getChannels()
+std::string		Server::getPassword() const
 {
-	return this->_channels;
+	return this->_password;
 }
 
-std::map<int, Client>&			Server::getClients()
-{
-	return this->_clients;
-}
-
-Client&							Server::getClient(int fd)
+Client&			Server::getClient(int fd)
 {
 	return this->_clients[fd];
 }
 
-int								Server::getClientIdByNickname(const std::string& nickname)
+Channel*		Server::addChannel(const std::string& channelName, const std::string& password, const int& fd)
 {
-	for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
-	{
-		if (it->second.getNickname() == nickname)
-			return it->first;
-	}
-	return -1;
+	this->_channels[channelName] = Channel(channelName, password, fd, this);
+	return &this->_channels[channelName];
 }
 
-void		Server::createChannel(const std::string& name, const std::string& password, Client& client)
+void		Server::removeChannel(const std::string& channelName)
 {
-	this->_channels.insert(std::pair<std::string, Channel>(name, Channel(name, password, client)));
+	this->_channels.erase(channelName);
+}
+
+Channel*	Server::getChannel(const std::string& channelName)
+{
+	if (this->_channels.find(channelName) == this->_channels.end())
+		return NULL;
+	return &this->_channels[channelName];
 }

@@ -1,55 +1,58 @@
+
+
 #ifndef CHANNEL_HPP
 # define CHANNEL_HPP
 
-# include <iostream>
-# include <string>
-# include <set>
-
 # include "General.hpp"
 
-class Client;
 class Server;
 
-class Channel
-{
-	private:
-		std::string							_name;
-		std::string							_password;
-		std::string							_topic;
-		int									_userLimit;
-		bool 								_passwordProtected;
-		bool 								_inviteOnly;
-		bool								_topicOperatorProtected;
-		std::set<int>						_clients;
-		std::set<int>						_operators;
-		Server*								_server;
+# include <set>
 
-	public:
-		Channel(const std::string& name, const std::string& password, Client& client);
-		~Channel();
-		// Accessors
-		bool								isPasswordProtected() const;
-		bool								isInviteOnly() const;
-		bool								isTopicOperatorProtected() const;
-		const std::string&					getPassword() const;
-		const std::string&					getName() const;
-		const std::string&					getTopic() const;
-		const std::string					getClientsList();
-		int 								getUserLimit() const;
-		std::set<int>&						getClients();
-		std::set<int>&						getOperators();
-		// Setters	
-		void								setLimit(int limit);
-		void								setTopic(const std::string& topic);
-		void								setPassword(const std::string& password);
-		void								setPasswordProtected(bool passwordProtected);
-		void								setTopicOperatorProtected(bool topicOperatorProtected);
-		void								setInviteOnly(bool inviteOnly);
-		void								addClient(Client & client);
-		void								removeClient(Client & client);
-		void								addOperator(Client & client);
-		void								removeOperator(Client & client);
+class Channel {
+private:
+	std::string		_name;
+	std::string		_password;
+	std::string		_topic;
+	std::set<int>	_clients;
+	std::set<int>	_operators;
+	std::set<int>	_invited;
+	size_t			_userLimit;
+	bool			_inviteOnly;
+	bool			_isTopicRestricted;
+	Server*			_server;
+
+public:
+	Channel();
+	Channel( std::string name, std::string password, const int &fd, Server *serv );
+	~Channel();
+
+	std::string					getName( void ) const;
+	void						setName( const std::string name );
+	std::string					getPassword( void ) const;
+	void						setPassword( const std::string password );
+	std::string					getTopic( void ) const;
+	void						setTopic( const std::string topic );
+	bool						isInviteOnly( void ) const;
+	void						setInviteOnly( const bool &inviteOnly );
+	size_t						getUserLimit( void ) const;
+	void						setUserLimit( const size_t &userLimit );
+	bool						isTopicRestricted( void ) const;
+	void						setTopicRestricted( const bool &isTopicRestricted );
+
+	int							addClient( const int &fd , const std::string &password);
+	int							removeClient( const int &fd );
+	bool						isClient( const int &fd ) const;
+
+	int 						addOperator( const int &fd );
+	int 						removeOperator( const int &fd );
+	bool						isOperator( const int &fd ) const;
+
+	int 						addInvite( const int &fd );
+	int 						removeInvite( const int &fd );
+	bool						isInvited( const int &fd ) const;
+	void						postMessageInChannel( const std::string& nickname, const std::string &message );
 };
 
 
-# endif
+#endif // CHANNEL_HPP

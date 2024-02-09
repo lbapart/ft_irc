@@ -30,7 +30,9 @@ class Channel;
 class Server
 {
 	private:
-		int		pollinEvent(const int &fd, std::vector<pollfd> &fds);
+		int			addClient( void );
+		int			pollinEvent(const int &fd, std::vector<pollfd> &fds);
+		int			getClientMessage(int fd, std::string &msg);
 
 		ushort								_port;
 		int									_socket;
@@ -40,6 +42,22 @@ class Server
 		std::map<std::string, Channel>		_channels;
 		std::map<int, Client>				_clients;
 	public:
+		Server(ushort port, const std::string& password);
+		~Server();
+
+		void		run();
+		void		sendResponse(int fd, const std::string& response);
+		void		executeCommands( const int &fd, const std::string &line );
+
+		Channel*	addChannel(const std::string& channelName, const std::string& password, const int& fd);
+		void		removeChannel(const std::string& channelName);
+		Channel*	getChannel(const std::string& channelName);
+
+		std::map<int, Client>&					getClients();
+		Client&									getClient(int fd);
+		int										getClientIdByNickname(const std::string& nickname);
+		std::string								getPassword() const;
+
 		class SocketCreationException : public std::exception
 		{
 			public:
@@ -70,20 +88,6 @@ class Server
 			public:
 				virtual const char* what() const throw();
 		};
-		Server(ushort port, const std::string& password);
-		~Server();
-		void		run();
-		int			connectClient();
-		int			getClientMessage(int fd, std::string &msg);
-		void		clientDisconnected(int fd);
-		void		sendResponse(int fd, const std::string& response);
-		int			authentificateConnection(struct newConnection& newClient);
-		void		createChannel(const std::string& name, const std::string& password, Client& client);
-
-		std::map<std::string, Channel>&			getChannels();
-		std::map<int, Client>&					getClients();
-		Client&									getClient(int fd);
-		int										getClientIdByNickname(const std::string& nickname);
 };
 
 #endif
