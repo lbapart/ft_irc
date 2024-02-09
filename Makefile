@@ -2,7 +2,7 @@ CXX			= c++
 NAME		= ircserv
 RM			= rm -rf
 
-CXXFLAGS	= -Wall -Wextra -Werror -MD -MP
+CXXFLAGS	= -Wall -Wextra -Werror -MD -MP -g
 
 MAKEFLAGS	= -j$(nproc)
 
@@ -20,7 +20,9 @@ all		: $(NAME)
 
 run		:
 		@make --no-print-directory re
-		@clear;./${NAME}
+		@make --no-print-directory clean
+		@clear;
+		./${NAME} 1111 1234
 
 $(NAME)	: $(OBJS)
 		$(CXX) -o $@ $^

@@ -30,6 +30,8 @@ class Channel;
 class Server
 {
 	private:
+		int		pollinEvent(const int &fd, std::vector<pollfd> &fds);
+
 		ushort								_port;
 		int									_socket;
 		std::string							_password;
@@ -71,7 +73,7 @@ class Server
 		Server(ushort port, const std::string& password);
 		~Server();
 		void		run();
-		int			clientConnected();
+		int			connectClient();
 		int			getClientMessage(int fd, std::string &msg);
 		void		clientDisconnected(int fd);
 		void		sendResponse(int fd, const std::string& response);

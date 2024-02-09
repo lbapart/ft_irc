@@ -14,7 +14,7 @@ int Server::authentificateConnection(newConnection& newClient)
 	}
 }
 
-int	Server::clientConnected()
+int	Server::connectClient()
 {
 	sockaddr_in clientAddr;
 	socklen_t	clientAddrLen = sizeof(clientAddr);

@@ -7,13 +7,11 @@ int	Server::getClientMessage(int fd, std::string &message)
 	char		buffer[1024];
 
 	std::memset(buffer, 0, 1024);
-
-	// std::cout << "Client fd" << fd << std::endl;
+	
 	int bytesRead = recv(fd, buffer, 1024, 0);
-	// std::cout << "BYTES READ: " << bytesRead << std::endl;
-	if (bytesRead == -1)
-		std::cerr << "Error reading from client" << std::endl;
-	if (bytesRead <= 0) {
+	if (bytesRead < 0)
+	{
+		std::cerr << "Error occured during communication with client" << std::endl;
 		this->_clients.erase(fd);
 		for (std::vector<pollfd>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++)
 		{
@@ -23,18 +21,29 @@ int	Server::getClientMessage(int fd, std::string &message)
 				break ;
 			}
 		}
-		// this->_fds.erase(fd);  //TODO: delete client from db -----------------------------
 		close(fd);
-		return (-1);
+		return (ERROR);
 	}
-
-	t_request _req;
-	int status = parseLines(_req, buffer, fd);
-	// std::cout << "BUFFER: " << buffer << std::endl;
-	message = buffer;
-	std::string response = ":server 001 aapenko :Welcome to the server\r\n";
-	send(fd, response.c_str(), response.size(), 0);
-	return status;
+	else if (bytesRead == 0)
+	{
+		std::cout << "Client disconnected" << std::endl; // TODO: createfunction for deleting user form db
+		this->_clients.erase(fd);
+		for (std::vector<pollfd>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++)
+		{
+			if (it->fd == fd)
+			{
+				this->_fds.erase(it);
+				break ;
+			}
+		}
+		close(fd);
+		return (ERROR);
+	}
+	else
+	{
+		message = buffer;
+		return (SUCCESS);
+	}
 }
 
 void		Server::sendResponse(int fd, const std::string& response)

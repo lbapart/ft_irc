@@ -1,6 +1,28 @@
 #include "../incl/Server.hpp"
 #include <algorithm>
 
+int	Server::pollinEvent(const int &fd, std::vector<pollfd> &fds)
+{
+	if (fd == this->_socket) // if socket fd is triggered, then new client tries to connect
+	{
+		std::cout << "New Client tries to connect!\n" << std::endl;
+		int	newClientFd = connectClient();
+		if (newClientFd == -1)
+			return (ERROR);
+		else
+			fds.push_back({newClientFd, POLLIN | POLLOUT, 0});
+	}
+	else // if client fd is triggered, then client sent a message
+	{
+		std::cout << "Client sent a message!\n" << std::endl;
+		std::string message;
+		if (getClientMessage(fd, message) == ERROR)
+			return (ERROR);
+		std::cout << "Message: " << message << std::endl;
+	}
+	return (SUCCESS);
+}
+
 void	Server::run()
 {
 	if (bind(this->_socket, (struct sockaddr *)&this->_addr, sizeof(this->_addr)) == -1)
@@ -21,29 +43,10 @@ void	Server::run()
 		std::vector<pollfd>::iterator it = this->_fds.begin();
 		while (it != this->_fds.end())
 		{
-			// std::cout << "loop run" << std::endl;
 			if (it->revents & POLLIN)
 			{
-				// std::cout << it->fd << std::endl;
-				// std::cout << "Socket fd = " << this->_socket << std::endl;
-				if (it->fd == this->_socket)
-				{
-					std::cout << "New Client tries to connect!" << std::endl;
-					int	fd = clientConnected();
-					if (fd == -1)
-						continue ;
-					temp.push_back({fd, POLLIN | POLLOUT, 0});
-				}
-				else
-				{
-					std::cout << "Client sent a message\n" << std::endl;
-					std::string message;
-					int status = getClientMessage(it->fd, message);
-					if (status == -1) {
-						std::cout << "BREAK" << std::endl;
-						break;
-					}
-				}
+				if (this->pollinEvent(it->fd, temp) == ERROR)
+					continue ;
 			}
 			else if (it->revents & POLLOUT)
 			{
