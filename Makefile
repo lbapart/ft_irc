@@ -22,6 +22,7 @@ run		:
 		@make --no-print-directory re
 		@make --no-print-directory clean
 		@clear;
+		@echo '/connect 127.0.0.1 1111 1234'
 		./${NAME} 1111 1234
 
 $(NAME)	: $(OBJS)

@@ -1,5 +1,8 @@
 #include "Client.hpp"
 #include "Server.hpp"
+#include <algorithm>
+#include <cctype>
+#include <locale>
 
 // Constructor && Destructor
 
@@ -41,15 +44,26 @@ std::string Client::getPassword() const
 	return this->_password;
 }
 
-void 		Client::setUsername(const std::string& username)
+void 		Client::setUsername(std::string username)
 {
+	// if username has a non valid character, replace it with '_'
+	// valid characters are: [a-zA-Z0-9_]
+	for (size_t i = 0; i < username.size(); ++i)
+		if (!(std::isalnum(username[i]) || username[i] == '_'))
+			username[i] = '_';
+
 	this->_username = this->_server->getAvailableUsername(username);
 	this->_isUsernameSet = true;
 	this->checkAndSetAuthentificated();
 }
 
-void Client::setNickname(const std::string& nickname)
+void Client::setNickname(std::string nickname)
 {
+	// if username has a non valid character, replace it with '_'
+	// valid characters are: [a-zA-Z0-9_]
+	for (size_t i = 0; i < nickname.size(); ++i)
+		if (!(std::isalnum(nickname[i]) || nickname[i] == '_'))
+			nickname[i] = '_';
 	// if nickname not set, set it
 	if (!this->_isNicknameSet)
 	{
@@ -147,6 +161,8 @@ void		Client::joinChannel(const std::string& channelName, const std::string& pas
 	this->_channels.push_back(channel);
 	this->_server->sendResponse(this->_fd, Response::OKjoinSuccess(this->_nickname, this->_username, channelName));
 	this->_channels.back()->postMessageInChannel(this->_nickname, this->_username, "has joined the channel");
+	if (channel->getTopic() != "")
+		this->_server->sendResponse(this->_fd, Response::OKsetChannelTopicSuccess(this->_nickname, channelName, channel->getTopic()));
 }
 
 void		Client::leaveChannel(const std::string& channelName)
@@ -168,4 +184,38 @@ void		Client::leaveChannel(const std::string& channelName)
 		}
 	}
 	this->_server->sendResponse(this->_fd, Response::ERRleaveFailed(this->_nickname, channelName));
+}
+
+void	Client::setTopic(const std::string& channelName, const std::string& topic) {
+	Channel *channel = this->_server->getChannel(channelName);
+
+	if (channel == NULL)
+	{
+		this->_server->sendResponse(this->_fd, Response::ERRsetChannelTopicFailed(this->_nickname, channelName));
+		return ; // TODo: maybe we need to send a different response
+	}
+	if (!channel->isClient(this->_fd))
+	{
+		this->_server->sendResponse(this->_fd, Response::ERRsetChannelTopicFailed(this->_nickname, channelName));
+		return ;
+	}
+	if (channel->isTopicRestricted() && !channel->isOperator(this->_fd))
+	{
+		this->_server->sendResponse(this->_fd, Response::ERRsetChannelTopicFailed(this->_nickname, channelName));
+		return ;
+	}
+	channel->setTopic(topic);
+	channel->brodcastResponse(Response::OKsetChannelTopicSuccess(this->_nickname, channelName, topic));
+}
+
+void	Client::sendPrvMsg(const std::string& nickname, const std::string& message)
+{
+	bool	client = this->_server->existByNickname(nickname);
+
+	if (client == false)
+	{
+		this->_server->sendResponse(this->_fd, Response::ERRprivateMessageFailed(this->_nickname, nickname));
+		return ;
+	}
+	this->_server->sendResponse(this->_server->getClientIdByNickname(nickname), Response::OKprivateMessageSuccess(this->_nickname, nickname, message));
 }

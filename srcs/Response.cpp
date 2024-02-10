@@ -173,9 +173,9 @@ const std::string	Response::ERRviewChannelTopicFailed(const std::string& nicknam
 	return response;
 }
 
-const std::string	Response::OKsetChannelTopicSuccess(const std::string& nickname, const std::string& channel)
+const std::string	Response::OKsetChannelTopicSuccess(const std::string& nickname, const std::string& channel, const std::string& topic)
 {
-	std::string response = ":" + std::string(SERVER_NAME) + " 333 " + nickname + " " + channel + " :Topic set successfully\r\n";
+	std::string response = ":" + std::string(SERVER_NAME) + " 332 " + nickname + " " + channel + " :" + topic + "\r\n";
 	return response;
 }
 

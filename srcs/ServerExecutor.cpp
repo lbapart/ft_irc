@@ -65,8 +65,25 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 			}
 			break;
 		case (4) : // TOPIC
+			{
+				std::istringstream iss(line);
+				std::string channelName, topic;
+				std::getline(iss, channelName, ' ');
+				std::getline(iss, channelName, ' ');
+				std::getline(iss, topic, ' ');
+				topic.assign(topic.begin() + 1, topic.end());
+				client.setTopic(channelName, topic);
+			}
 			break;
 		case (5) : // PRIVMSG
+			{
+				std::istringstream iss(line);
+				std::string username, message;
+				std::getline(iss, username, ' ');
+				std::getline(iss, username, ' ');
+				message = line.substr(line.find(":") + 1);
+				client.sendPrvMsg(username, message);
+			}
 			break;
 		case (6) : // JOIN
 			{

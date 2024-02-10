@@ -139,3 +139,13 @@ std::map<int, Client>&	Server::getClients()
 {
 	return this->_clients;
 }
+
+int	Server::getClientIdByNickname(const std::string& nickname)
+{
+	for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+	{
+		if (it->second.getNickname() == nickname)
+			return it->first;
+	}
+	return -1;
+}

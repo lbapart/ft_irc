@@ -5,7 +5,6 @@ int	Server::pollinEvent(const int &fd, std::vector<pollfd> &fds)
 {
 	if (fd == this->_socket) // if socket fd is triggered, then new client tries to connect
 	{
-		std::cout << "New Client tries to connect!\n" << std::endl;
 		int	newClientFd = addClient();
 		if (newClientFd == -1)
 			return (ERROR);
@@ -14,7 +13,6 @@ int	Server::pollinEvent(const int &fd, std::vector<pollfd> &fds)
 	}
 	else // if client fd is triggered, then client sent a message
 	{
-		std::cout << "Client sent a message!\n" << std::endl;
 		std::string message;
 		if (this->getClientMessage(fd, message) == ERROR)
 			return (ERROR);

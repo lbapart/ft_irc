@@ -65,7 +65,7 @@ class Response
 
 		// Set / view channel topic
 		// Successful set channel topic, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
-		static const std::string	OKsetChannelTopicSuccess(const std::string& nickname, const std::string& channel);
+		static const std::string	OKsetChannelTopicSuccess(const std::string& nickname, const std::string& channel, const std::string& topic);
 		// Failed set channel topic, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
 		static const std::string	ERRsetChannelTopicFailed(const std::string& nickname, const std::string& channel);
 		// Successful view channel topic, takes nickname, channel and topic as arguments (const std::string& nickname, const std::string& channel, const std::string& topic)

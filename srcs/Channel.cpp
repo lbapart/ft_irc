@@ -173,3 +173,11 @@ void	Channel::postMessageInChannel( const std::string& nickname, const std::stri
 		this->_server->sendResponse(*it, Response::OKmessageSuccess(nickname, username, this->_name, message));
 	}
 }
+
+void	Channel::brodcastResponse( const std::string &response )
+{
+	for (std::set<int>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+	{
+		this->_server->sendResponse(*it, response);
+	}
+}
