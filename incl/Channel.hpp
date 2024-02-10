@@ -51,7 +51,7 @@ public:
 	int 						addInvite( const int &fd );
 	int 						removeInvite( const int &fd );
 	bool						isInvited( const int &fd ) const;
-	void						postMessageInChannel( const std::string& nickname, const std::string& username, const std::string &message );
+	void						postMessageInChannel( const std::string &message, const int& fd );
 	void						brodcastResponse( const std::string &response );
 };
 

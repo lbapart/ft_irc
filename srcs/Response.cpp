@@ -271,3 +271,9 @@ const std::string	Response::ERRmsgToChannel(const std::string& nickname, const s
 	std::string response = ":" + std::string(SERVER_NAME) + " 482 " + nickname + " " + command + " :" + message + "\r\n";
 	return response;
 }
+
+const std::string	Response::ERRmsgToUser(const std::string& nickname, const std::string& command, const std::string& message)
+{
+	std::string response = ":" + std::string(SERVER_NAME) + " 403 " + nickname + " :" + command + " :" + message + "\r\n";
+	return response;
+}

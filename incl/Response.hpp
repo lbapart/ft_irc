@@ -112,8 +112,9 @@ class Response
 		// Failed take operator status, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
 		static const std::string	ERRtakeOperatorStatusFailed(const std::string& nickname, const std::string& channel);
 
-		// Successful give voice status, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
+		// Beautiful error messages
 		static const std::string	ERRmsgToChannel(const std::string& nickname, const std::string& command, const std::string& message);
+		static const std::string	ERRmsgToUser(const std::string& nickname, const std::string& command, const std::string& message);
 		// Unkown command
 		// Failed unknown command, takes nickname and command as arguments (const std::string& nickname, const std::string& command)
 		static const std::string	ERRunknownCommand(const std::string& nickname, const std::string& command);

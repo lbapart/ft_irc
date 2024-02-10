@@ -80,7 +80,8 @@ void Client::setNickname(std::string nickname)
 	{
 		for (std::vector<Channel *>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
 		{
-			(*it)->postMessageInChannel(this->_nickname, this->_username, "has changed his nickname to " + newNickname);
+			std::string response = Response::OKmessageSuccess(this->_nickname, this->_username, (*it)->getName(), "has changed his nickname to " + newNickname);
+			(*it)->brodcastResponse(response);
 		}
 		for (std::map<int, Client>::iterator it = this->_server->getClients().begin(); it != this->_server->getClients().end(); it++)
 		{
@@ -154,7 +155,8 @@ void		Client::joinChannel(const std::string& channelName, const std::string& pas
 	{
 		this->_channels.push_back(this->_server->addChannel(channelName, password, this->_fd));
 		this->_server->sendResponse(this->_fd, Response::OKjoinSuccess(this->_nickname, this->_username, channelName));
-		this->_channels.back()->postMessageInChannel(this->_nickname, this->_username, "has joined the channel");
+		std::string response = Response::OKmessageSuccess(this->_nickname, this->_username, channelName, "has joined the channel");
+		this->_channels.back()->brodcastResponse(response);
 		return ;
 	}
 	// if channel exists
@@ -166,7 +168,8 @@ void		Client::joinChannel(const std::string& channelName, const std::string& pas
 	}
 	this->_channels.push_back(channel);
 	this->_server->sendResponse(this->_fd, Response::OKjoinSuccess(this->_nickname, this->_username, channelName));
-	this->_channels.back()->postMessageInChannel(this->_nickname, this->_username, "has joined the channel");
+	std::string response = Response::OKmessageSuccess(this->_nickname, this->_username, channel->getName(), "has joined the channel");
+	this->_channels.back()->brodcastResponse(response);
 	if (channel->getTopic() != "")
 		this->_server->sendResponse(this->_fd, Response::OKsetChannelTopicSuccess(this->_nickname, channelName, channel->getTopic()));
 }
@@ -183,7 +186,8 @@ void		Client::leaveChannel(const std::string& channelName)
 			(*it)->removeOperator(this->_fd);
 			(*it)->removeInvite(this->_fd);
 			this->_server->sendResponse(this->_fd, Response::OKleaveSuccess(this->_nickname, this->_username, channelName));
-			(*it)->postMessageInChannel(this->_nickname, this->_username ,"has left the channel");
+			std::string response = Response::OKmessageSuccess(this->_nickname, this->_username, (*it)->getName(), "has left the channel");
+			(*it)->brodcastResponse(response);
 			std::cout << '\'' << this->_nickname << '\'' << " has left the channel" << std::endl;
 			this->_channels.erase(it);
 			return ;
@@ -216,23 +220,42 @@ void	Client::setTopic(const std::string& channelName, const std::string& topic) 
 
 void	Client::sendPrvMsg(const std::string& nickname, const std::string& message)
 {
-	bool	client = this->_server->existByNickname(nickname);
-
-	if (client == false)
+	if (nickname[0] != '#')
 	{
-		this->_server->sendResponse(this->_fd, Response::ERRprivateMessageFailed(this->_nickname, nickname));
-		return ;
+		bool	client = this->_server->existByNickname(nickname);
+		if (client == false)
+			this->_server->sendResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "User does not exist"));
+		else
+			this->_server->sendResponse(this->_server->getClientIdByNickname(nickname), Response::OKprivateMessageSuccess(this->_nickname, nickname, message));
 	}
-	this->_server->sendResponse(this->_server->getClientIdByNickname(nickname), Response::OKprivateMessageSuccess(this->_nickname, nickname, message));
+	else
+	{
+		Channel *channel = this->_server->getChannel(nickname);
+
+		if (channel != NULL)
+		{
+			if (!channel->isClient(this->_fd))
+				this->_server->sendResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "You are not in the channel"));
+			else
+			{
+				std::string response = Response::OKmessageSuccess(this->_nickname, this->_username, channel->getName(), message);
+				channel->postMessageInChannel(response, this->_fd);
+			}
+		}
+		else
+		{
+			this->_server->sendResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "Channel does not exist"));
+		}
+	}
 }
 
 void	Client::kickUser(const std::string& channelName, const std::string& nickname, const std::string& reason)
 {
 	Channel *channel = this->_server->getChannel(channelName);
 
-	if (channel == NULL)
+	if (channel == NULL || !channel->isClient(this->_fd))
 	{
-		this->_server->sendResponse(this->_fd, Response::ERRkickFailed(this->_nickname, "KICK", 403));
+		this->_server->sendResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "KICK", "You are not in the channel"));
 		return ;
 	}
 	if (!channel->isOperator(this->_fd))
@@ -249,6 +272,4 @@ void	Client::kickUser(const std::string& channelName, const std::string& nicknam
 	Client& kickedClient = this->_server->getClient(this->_server->getClientIdByNickname(nickname));
 	kickedClient.leaveChannel(channelName);
 	channel->brodcastResponse(Response::OKkickSuccess(this->_nickname, this->_username, nickname, channelName, reason));
-	// this->_server->sendResponse(this->_server->getClientIdByUsername(username), Response::OKkickSuccess(this->_nickname, channelName, reason));
-	// channel->postMessageInChannel(this->_nickname, this->_username, "has kicked " + username + " from the channel");
 }
