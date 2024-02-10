@@ -25,25 +25,25 @@ class Response
 
 		// Join
 		// Successful join, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
-		static const std::string	OKjoinSuccess(const std::string& nickname, const std::string& channel);
+		static const std::string	OKjoinSuccess(const std::string& nickname, const std::string& username, const std::string& channel);
 		// Failed join, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
 		static const std::string	ERRjoinFailed(const std::string& nickname, const std::string& channel, int error);
 
 		// Nick
 		// Successful set of nickname, takes old and new nickname as arguments (const std::string& oldNickname, const std::string& newNickname)
-		static const std::string	OKnickSetupSuccess(const std::string& oldNickname, const std::string& newNickname);
+		static const std::string	OKnickSetupSuccess(const std::string& oldNickname, const std::string& newNickname, const std::string& username);
 		// Failed set of nickname, takes old and new nickname as arguments (const std::string& oldNickname, const std::string& newNickname)
 		static const std::string	ERRnickSetupFailed(const std::string& oldNickname, const std::string& newNickname);
 
 		// Leave
 		// Successful leave, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
-		static const std::string	OKleaveSuccess(const std::string& nickname, const std::string& channel);
+		static const std::string	OKleaveSuccess(const std::string& nickname, const std::string& username, const std::string& channel);
 		// Failed leave, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
 		static const std::string	ERRleaveFailed(const std::string& nickname, const std::string& channel);
 
 		// Messages
 		// Successful message, takes nickname, channel and message as arguments (const std::string& nickname, const std::string& message)
-		static const std::string	OKmessageSuccess(const std::string& nickname, const std::string& channel, const std::string& message);
+		static const std::string	OKmessageSuccess(const std::string& nickname, const std::string& username, const std::string& channel, const std::string& message);
 		// Failed message, takes nickname, channel and message as arguments (const std::string& nickname, const std::string& message)
 		static const std::string	ERRmessageFailed(const std::string& nickname, const std::string& channel);
 		// Successful private message, takes nicknames (sender, receiver) and message as arguments (const std::string& sender, const std::string& receiver  ,const std::string& message)

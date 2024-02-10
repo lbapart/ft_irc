@@ -52,9 +52,9 @@ const std::string	Response::ERRconnectionInvalidPassword(const std::string& nick
 	return response;
 }
 
-const std::string	Response::OKjoinSuccess(const std::string& nickname, const std::string& channel)
+const std::string	Response::OKjoinSuccess(const std::string& nickname, const std::string& username, const std::string& channel)
 {
-	std::string response = ":" + nickname + "!" + std::string(SERVER_NAME) + "@localhost JOIN " + channel + "\r\n";
+	std::string response = ":" + nickname + "!" + username + "@localhost JOIN :" + channel + "\r\n";
 	return response;
 }
 
@@ -64,10 +64,10 @@ const std::string	Response::ERRjoinFailed(const std::string& nickname, const std
 	return response;
 }
 
-const std::string	Response::OKnickSetupSuccess(const std::string& oldNickname, const std::string& newNickname)
+const std::string	Response::OKnickSetupSuccess(const std::string& oldNickname, const std::string& newNickname, const std::string& username)
 {
-	std::string response = ":" + oldNickname + "!" + std::string(SERVER_NAME) + "@localhost NICK :" + newNickname + "\r\n";
-    return response;
+	std::string response = ":" + oldNickname + "!" + username + "@localhost NICK :" + newNickname + "\r\n";
+	return response;
 }
 
 const std::string	Response::ERRnickSetupFailed(const std::string& oldNickname, const std::string& newNickname)
@@ -76,9 +76,9 @@ const std::string	Response::ERRnickSetupFailed(const std::string& oldNickname, c
     return response;
 }
 
-const std::string	Response::OKleaveSuccess(const std::string& nickname, const std::string& channel)
+const std::string	Response::OKleaveSuccess(const std::string& nickname, const std::string& username, const std::string& channel)
 {
-	std::string response = ":" + nickname + "!" + std::string(SERVER_NAME) + "@localhost PART " + channel + "\r\n";
+	std::string response = ":" + nickname + "!" + username + "@localhost PART " + channel  + "\r\n";
 	return response;
 }
 
@@ -88,9 +88,9 @@ const std::string	Response::ERRleaveFailed(const std::string& nickname, const st
 	return response;
 }
 
-const std::string	Response::OKmessageSuccess(const std::string& nickname, const std::string& channel, const std::string& message)
+const std::string	Response::OKmessageSuccess(const std::string& nickname, const std::string& username, const std::string& channel, const std::string& message)
 {
-	std::string response = ":" + nickname + "!" + std::string(SERVER_NAME) + "@localhost PRIVMSG " + channel + " :" + message + "\r\n";
+	std::string response = ":" + nickname + "!" + username + "@localhost PRIVMSG " + channel + " :" + message + "\r\n";
 	return response;
 }
 
@@ -100,6 +100,7 @@ const std::string	Response::ERRmessageFailed(const std::string& nickname, const 
 	return response;
 }
 
+// не уверен, что это правильно
 const std::string	Response::OKprivateMessageSuccess(const std::string& sender, const std::string& receiver, const std::string& message)
 {
 	std::string response = ":" + sender + "!" + std::string(SERVER_NAME) + "@localhost PRIVMSG " + receiver + " :" + message + "\r\n";

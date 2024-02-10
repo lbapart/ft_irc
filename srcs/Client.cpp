@@ -50,9 +50,30 @@ void 		Client::setUsername(const std::string& username)
 
 void Client::setNickname(const std::string& nickname)
 {
-	this->_nickname = this->_server->getAvailableNickname(nickname);
-	this->_isNicknameSet = true;
-	this->checkAndSetAuthentificated();
+	// if nickname not set, set it
+	if (!this->_isNicknameSet)
+	{
+		this->_nickname = this->_server->getAvailableNickname(nickname);
+		this->_isNicknameSet = true;
+		this->checkAndSetAuthentificated();
+		return ;
+	}
+	// otherwise, change it
+	std::string newNickname = std::string(nickname.begin(), nickname.end());
+	if (this->_server->existByNickname(newNickname))
+		this->_server->sendResponse(this->_fd, Response::ERRnickSetupFailed(this->_nickname, newNickname));
+	else
+	{
+		for (std::vector<Channel *>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
+		{
+			(*it)->postMessageInChannel(this->_nickname, this->_username, "has changed his nickname to " + newNickname);
+		}
+		for (std::map<int, Client>::iterator it = this->_server->getClients().begin(); it != this->_server->getClients().end(); it++)
+		{
+			this->_server->sendResponse(it->second.getFd(), Response::OKnickSetupSuccess(this->_nickname, newNickname, this->_username));
+		}
+		this->_nickname = newNickname;
+	}
 }
 
 void Client::setPassword(const std::string& password)
@@ -86,7 +107,7 @@ void		Client::checkAndSetAuthentificated()
 
 // methods
 
-void	Client::pong( void )
+void		Client::pong( void )
 {
 	this->_server->sendResponse(this->_fd, "PONG :localhost\r\n");
 }
@@ -112,8 +133,8 @@ void		Client::joinChannel(const std::string& channelName, const std::string& pas
 	if (channel == NULL)
 	{
 		this->_channels.push_back(this->_server->addChannel(channelName, password, this->_fd));
-		this->_server->sendResponse(this->_fd, Response::OKjoinSuccess(this->_nickname, channelName));
-		this->_channels.back()->postMessageInChannel(this->_nickname, "has joined the channel");
+		this->_server->sendResponse(this->_fd, Response::OKjoinSuccess(this->_nickname, this->_username, channelName));
+		this->_channels.back()->postMessageInChannel(this->_nickname, this->_username, "has joined the channel");
 		return ;
 	}
 	// if channel exists
@@ -124,8 +145,8 @@ void		Client::joinChannel(const std::string& channelName, const std::string& pas
 		return ;
 	}
 	this->_channels.push_back(channel);
-	this->_server->sendResponse(this->_fd, Response::OKjoinSuccess(this->_nickname, channelName));
-	this->_channels.back()->postMessageInChannel(this->_nickname, "has joined the channel");
+	this->_server->sendResponse(this->_fd, Response::OKjoinSuccess(this->_nickname, this->_username, channelName));
+	this->_channels.back()->postMessageInChannel(this->_nickname, this->_username, "has joined the channel");
 }
 
 void		Client::leaveChannel(const std::string& channelName)
@@ -139,8 +160,9 @@ void		Client::leaveChannel(const std::string& channelName)
 			(*it)->removeClient(this->_fd);
 			(*it)->removeOperator(this->_fd);
 			(*it)->removeInvite(this->_fd);
-			this->_server->sendResponse(this->_fd, Response::OKleaveSuccess(this->_nickname, channelName));
-			(*it)->postMessageInChannel(this->_nickname, "has left the channel");
+			this->_server->sendResponse(this->_fd, Response::OKleaveSuccess(this->_nickname, this->_username, channelName));
+			(*it)->postMessageInChannel(this->_nickname, this->_username ,"has left the channel");
+			std::cout << '\'' << this->_nickname << '\'' << " has left the channel" << std::endl;
 			this->_channels.erase(it);
 			return ;
 		}

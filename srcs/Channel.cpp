@@ -166,10 +166,10 @@ bool	Channel::isInvited( const int &fd ) const
 	return (this->_invited.count(fd) == 1);
 }
 
-void	Channel::postMessageInChannel( const std::string& nickname, const std::string &message )
+void	Channel::postMessageInChannel( const std::string& nickname, const std::string& username, const std::string &message )
 {
 	for (std::set<int>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 	{
-		this->_server->sendResponse(*it, Response::OKmessageSuccess(nickname, this->_name, message));
+		this->_server->sendResponse(*it, Response::OKmessageSuccess(nickname, username, this->_name, message));
 	}
 }

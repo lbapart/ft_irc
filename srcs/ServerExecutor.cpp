@@ -45,12 +45,14 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 	switch (index) {
 		case (0) :
 			client.setPassword(line.substr(5));
+			std::cout << '\'' << line.substr(5) << '\'' << std::endl;
 			break;
 		case (1) : // NICK
+			std::cout << '\'' << line.substr(5) << '\'' << std::endl;
 			client.setNickname(line.substr(5));
 			break;
 		case (2) : // Ping
-			// client.sendToClient("PONG :localhost\r\n");
+			client.pong();
 			break;
 		case (3) : // USER
 			{
@@ -58,6 +60,7 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 				std::string token;
 				std::getline(iss, token, ' ');
 				std::getline(iss, token, ' ');
+				std::cout << '\'' << token << '\'' << std::endl;
 				client.setUsername(token);
 			}
 			break;
