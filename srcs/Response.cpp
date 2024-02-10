@@ -113,9 +113,9 @@ const std::string	Response::ERRprivateMessageFailed(const std::string& sender, c
 	return response;
 }
 
-const std::string	Response::OKinviteSuccess(const std::string& nickname, const std::string& channel)
+const std::string	Response::OKinviteSuccess(const std::string& nickname, const std::string& username, const std::string& invitedUsername, const std::string& channel)
 {
-	std::string response = ":" + std::string(SERVER_NAME) + " 341 " + nickname + " " + channel + " :Invited successfully\r\n";
+	std::string response = ":" + nickname + "!" + username + "@localhost 341 " + nickname + " " + invitedUsername + " " + channel + "\r\n";
 	return response;
 }
 

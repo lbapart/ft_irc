@@ -273,3 +273,37 @@ void	Client::kickUser(const std::string& channelName, const std::string& nicknam
 	kickedClient.leaveChannel(channelName);
 	channel->brodcastResponse(Response::OKkickSuccess(this->_nickname, this->_username, nickname, channelName, reason));
 }
+
+void	Client::inviteUser(const std::string& nickname, const std::string& channelName)
+{
+	Channel *channel = this->_server->getChannel(channelName);
+
+	if (channel == NULL || !channel->isClient(this->_fd))
+	{
+		this->_server->sendResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "INVITE", "You are not in the channel"));
+		return ;
+	}
+	// if (!channel->isOperator(this->_fd))
+	// {
+	// 	this->_server->sendResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "You are not an operator"));
+	// 	return ;
+	// }
+	if (channel->isClient(this->_server->getClientIdByNickname(nickname)))
+	{
+		this->_server->sendResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "User is already in the channel"));
+		return ;
+	}
+	if (channel->isInvited(this->_server->getClientIdByNickname(nickname)))
+	{
+		this->_server->sendResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "User is already invited"));
+		return ;
+	}
+	int fd = this->_server->getClientIdByNickname(nickname);
+	if (fd == -1)
+	{
+		this->_server->sendResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "User does not exist"));
+		return ;
+	}
+	channel->addInvite(fd);
+	this->_server->sendResponse(this->_server->getClientIdByNickname(nickname), Response::OKinviteSuccess(this->_nickname, this->_username, nickname, channelName));
+}

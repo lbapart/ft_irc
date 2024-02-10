@@ -7,7 +7,7 @@ int	Server::getClientMessage(int fd, std::string &message)
 	char		buffer[1024];
 
 	std::memset(buffer, 0, 1024);
-	
+
 	int bytesRead = recv(fd, buffer, 1024, 0);
 	if (bytesRead < 0)
 	{
@@ -57,7 +57,7 @@ void		Server::sendResponse(int fd, const std::string& response)
 			if (errno == EWOULDBLOCK || errno == EAGAIN)
 				continue ;
 			else
-				throw SendException();
+				throw SendException(); //here
 		}
 		bytesSent += sent;
 	}

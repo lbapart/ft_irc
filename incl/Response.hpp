@@ -53,7 +53,8 @@ class Response
 
 		// Invite
 		// Successful invite, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
-		static const std::string	OKinviteSuccess(const std::string& nickname, const std::string& channel);
+		static const std::string	OKinviteSuccess(const std::string& nickname, const std::string& username, const std::string& invitedUsername, const std::string& channel);
+
 		// Failed invite, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
 		static const std::string	ERRinviteFailed(const std::string& nickname, const std::string& channel);
 

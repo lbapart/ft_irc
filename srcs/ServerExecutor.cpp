@@ -109,6 +109,14 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 		case (8) : // QUIT
 			break;
 		case (9) : // INVITE
+			{
+				std::istringstream iss(line);
+				std::string nickname, channelName;
+				std::getline(iss, nickname, ' ');
+				std::getline(iss, nickname, ' ');
+				std::getline(iss, channelName, ' ');
+				client.inviteUser(nickname, channelName);
+			}
 			break;
 		case (10):   // LEAVE
 			{

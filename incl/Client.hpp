@@ -46,6 +46,8 @@ class Client
 		void			setTopic(const std::string& channelName, const std::string& topic);
 		void			sendPrvMsg(const std::string& nickname, const std::string& message);
 		void			kickUser(const std::string& channelName, const std::string& username, const std::string& reason);
+		void			inviteUser(const std::string& nickname, const std::string& channelName);
+
 
 		// int				changeChannelTopic(const std::string& topic);
 		// int				kickClientFromChannel(const std::string& nickname);
