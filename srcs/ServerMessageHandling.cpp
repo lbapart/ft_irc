@@ -1,13 +1,11 @@
-#include "Server.hpp"
-#include <vector>
-
+#include "General.hpp"
 
 int	Server::getClientMessage(int fd, std::string &message)
 {
 	char		buffer[1024];
 
 	std::memset(buffer, 0, 1024);
-	
+
 	int bytesRead = recv(fd, buffer, 1024, 0);
 	if (bytesRead < 0)
 	{

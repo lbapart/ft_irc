@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "General.hpp"
 
 int	Server::addClient()
 {

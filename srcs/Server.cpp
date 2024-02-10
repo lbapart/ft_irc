@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "General.hpp"
 
 //Constructor && Destructor
 
@@ -92,3 +92,4 @@ Channel*	Server::getChannel(const std::string& channelName)
 		return NULL;
 	return &this->_channels[channelName];
 }
+

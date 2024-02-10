@@ -1,5 +1,4 @@
-#include "Client.hpp"
-#include "Server.hpp"
+#include "General.hpp"
 
 // Constructor && Destructor
 
