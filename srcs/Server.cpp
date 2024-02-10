@@ -1,6 +1,4 @@
-#include "Server.hpp"
-
-//Constructor && Destructor
+#include "General.hpp"
 
 Server::Server(ushort port, const std::string& password)
 {
@@ -29,6 +27,8 @@ Server::Server(ushort port, const std::string& password)
 
 Server::~Server()
 {
+	for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+		close(it->first);
 	close(this->_socket);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////

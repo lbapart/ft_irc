@@ -1,5 +1,11 @@
 #include "General.hpp"
 
+void	signal_handler(int signum)
+{
+	if (signum == SIGINT)
+		g_running = false;
+}
+
 int main(int argc, char **argv)
 {
 	if (argc != 3)
@@ -15,6 +21,7 @@ int main(int argc, char **argv)
 		if (port.fail())
 			throw std::invalid_argument("Invalid port");
 		Server server(_port, std::string(argv[2]));
+		signal(SIGINT, signal_handler);
 		server.run();
 	}
 	catch (const std::exception& e)

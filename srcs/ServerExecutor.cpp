@@ -1,9 +1,4 @@
-
-#include "../incl/General.hpp"
-#include <algorithm>
-#include <cstddef>
-#include <iostream>
-#include <sstream>
+#include "General.hpp"
 
 static std::vector<std::string>	parseLines( const std::string &str ) {
 	std::vector<std::string>	result;

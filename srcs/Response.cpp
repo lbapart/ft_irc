@@ -1,26 +1,8 @@
-#include "Response.hpp"
+#include "General.hpp"
 
-// connection
-// join
-// nick
-// leave
-// message
-// private message
-// invite
-// kick
-// set channel password
-// view channel topic
-// set channel topic
+Response::Response() {}
 
-Response::Response()
-{
-	;
-}
-
-Response::~Response()
-{
-	;
-}
+Response::~Response() {}
 
 const std::string	Response::OKpingSuccess(const std::string& nickname)
 {

@@ -1,7 +1,4 @@
-
-#include "Channel.hpp"
-
-#include <iostream>
+#include "General.hpp"
 
 Channel::Channel() {}
 Channel::Channel( std::string name, std::string password, const int& fd, Server *serv )

@@ -1,26 +1,6 @@
 #include "../incl/Server.hpp"
-#include <algorithm>
 
-int	Server::pollinEvent(const int &fd, std::vector<pollfd> &fds)
-{
-	if (fd == this->_socket) // if socket fd is triggered, then new client tries to connect
-	{
-		int	newClientFd = addClient();
-		if (newClientFd == -1)
-			return (ERROR);
-		else
-			fds.push_back({newClientFd, POLLIN | POLLOUT, 0});
-	}
-	else // if client fd is triggered, then client sent a message
-	{
-		std::string message;
-		if (this->getClientMessage(fd, message) == ERROR)
-			return (ERROR);
-		std::cout << "Message: " << message << std::endl;
-		this->executeCommands(fd, message);
-	}
-	return (SUCCESS);
-}
+bool	g_running = true;
 
 void	Server::run()
 {
@@ -30,7 +10,7 @@ void	Server::run()
 	//listen function limits the number of pending connections
 	if (listen(this->_socket, 10) == -1)
 		throw SocketListenException();
-	while (1)
+	while (g_running)
 	{
 		std::vector<pollfd>	temp;
 
@@ -60,4 +40,39 @@ void	Server::run()
 
 		this->_fds.insert(this->_fds.end(), temp.begin(), temp.end());
 	}
+}
+
+int	Server::pollinEvent(const int &fd, std::vector<pollfd> &fds)
+{
+	if (fd == this->_socket) // if socket fd is triggered, then new client tries to connect
+	{
+		int	newClientFd = addClient();
+		if (newClientFd == -1)
+			return (ERROR);
+		else
+			fds.push_back({newClientFd, POLLIN | POLLOUT, 0});
+	}
+	else // if client fd is triggered, then client sent a message
+	{
+		std::string message;
+		if (this->getClientMessage(fd, message) == ERROR)
+			return (ERROR);
+		std::cout << "Message: " << message << std::endl;
+		this->executeCommands(fd, message);
+	}
+	return (SUCCESS);
+}
+
+int	Server::addClient()
+{
+	sockaddr_in clientAddr;
+	socklen_t	clientAddrLen = sizeof(clientAddr);
+
+	int fd = accept(this->_socket, (struct sockaddr *)&clientAddr, &clientAddrLen);
+	if (fd == -1)
+		return (fd);
+
+	this->_clients.insert(std::pair<int, Client>(fd, Client(fd, this)));
+
+	return (fd);
 }

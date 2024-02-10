@@ -1,5 +1,4 @@
-#include "Server.hpp"
-
+#include "General.hpp"
 
 int	Server::getClientMessage(int fd, std::string &message)
 {

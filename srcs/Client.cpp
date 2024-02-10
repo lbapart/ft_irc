@@ -1,10 +1,4 @@
-#include "Client.hpp"
-#include "Server.hpp"
-#include <algorithm>
-#include <cctype>
-#include <locale>
-
-// Constructor && Destructor
+#include "General.hpp"
 
 Client::Client() {}
 
