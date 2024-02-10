@@ -22,6 +22,18 @@ Response::~Response()
 	;
 }
 
+const std::string	Response::OKpingSuccess(const std::string& nickname)
+{
+	std::string response = ":" + std::string(SERVER_NAME) + " PONG " + nickname + " :localhost\r\n";
+	return response;
+}
+
+const std::string	Response::ERRpingFailed(const std::string& nickname)
+{
+	std::string response = ":" + std::string(SERVER_NAME) + " 421 " + nickname + " :Unknown command\r\n";
+	return response;
+}
+
 const std::string	Response::OKconnectionSuccess(const std::string& nickname)
 {
 	std::string response = ":" + std::string(SERVER_NAME) + " 001 " + nickname + " :Welcome to the Internet Relay Network " + nickname + "!" + SERVER_NAME + "@localhost\r\n";
@@ -36,7 +48,7 @@ const std::string	Response::ERRconnectionFailed(const std::string& nickname)
 
 const std::string	Response::ERRconnectionInvalidPassword(const std::string& nickname)
 {
-	std::string response = ":" + std::string(SERVER_NAME) + " 464 " + nickname + " :Invalid password\r\n";
+	std::string response = ":" + std::string(SERVER_NAME) + " 464 " + nickname + " :Invalid password toscho\r\n";
 	return response;
 }
 
@@ -48,7 +60,7 @@ const std::string	Response::OKjoinSuccess(const std::string& nickname, const std
 
 const std::string	Response::ERRjoinFailed(const std::string& nickname, const std::string& channel)
 {
-	std::string response = ":" + std::string(SERVER_NAME) + " 473 " + nickname + " " + channel + " :No such channel\r\n";
+	std::string response = ":" + std::string(SERVER_NAME) + " 475 " + nickname + " " + channel + " :No such channel\r\n";
 	return response;
 }
 

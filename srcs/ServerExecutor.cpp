@@ -25,7 +25,7 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 	std::string		commands[11] = {
 		"PASS",
     	"NICK",
-    	"PART",
+    	"PING",
     	"USER",
     	"TOPIC",
     	"PRIVMSG",
@@ -49,7 +49,8 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 		case (1) : // NICK
 			client.setNickname(line.substr(5));
 			break;
-		case (2) : // PART
+		case (2) : // Ping
+			// client.sendToClient("PONG :localhost\r\n");
 			break;
 		case (3) : // USER
 			{

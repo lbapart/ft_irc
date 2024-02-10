@@ -40,6 +40,7 @@ class Client
 		void			setPassword(const std::string& password);
 
 		//methods
+		void			pong( void );
 		void			joinChannel(const std::string& channelName, const std::string& password);
 		// int				changeChannelTopic(const std::string& topic);
 		// int				kickClientFromChannel(const std::string& nickname);

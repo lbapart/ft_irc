@@ -10,6 +10,11 @@ class Response
 		Response();
 	public:
 		~Response();
+		// Ping
+		// Successful ping, takes nickname as argument (const std::string& nickname)
+		static const std::string	OKpingSuccess(const std::string& nickname);
+		// Failed ping, takes nickname as argument (const std::string& nickname)
+		static const std::string	ERRpingFailed(const std::string& nickname);
 		// Connection
 		// Successfull connection, takes nickname as argument (const std::string& nickname)
 		static const std::string	OKconnectionSuccess(const std::string& nickname);

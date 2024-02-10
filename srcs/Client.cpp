@@ -67,9 +67,6 @@ void Client::setPassword(const std::string& password)
 
 void		Client::checkAndSetAuthentificated()
 {
-	std::cout << "isPasswordSet: " << this->_isPasswordSet << std::endl;
-	std::cout << "isUsernameSet: " << this->_isUsernameSet << std::endl;
-	std::cout << "isNicknameSet: " << this->_isNicknameSet << std::endl;
 	if (!(this->_isPasswordSet && this->_isUsernameSet && this->_isNicknameSet))
 		return ;
 	std::cout << "fd: " << this->_fd << std::endl;
@@ -88,6 +85,11 @@ void		Client::checkAndSetAuthentificated()
 }
 
 // methods
+
+void	Client::pong( void )
+{
+	this->_server->sendResponse(this->_fd, "PONG :localhost\r\n");
+}
 
 void		Client::joinChannel(const std::string& channelName, const std::string& password)
 {
