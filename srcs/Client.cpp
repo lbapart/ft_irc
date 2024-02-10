@@ -109,7 +109,6 @@ void		Client::joinChannel(const std::string& channelName, const std::string& pas
 
 	Channel *channel = this->_server->getChannel(channelName);
 	// if channel does not exist, create it
-	// TODO : on join success, maybe we need to send a message to all of the clients in the channel
 	if (channel == NULL)
 	{
 		this->_channels.push_back(this->_server->addChannel(channelName, password, this->_fd));
@@ -118,9 +117,10 @@ void		Client::joinChannel(const std::string& channelName, const std::string& pas
 		return ;
 	}
 	// if channel exists
-	if (channel->addClient(this->_fd, password) == ERROR)
+	int code = channel->addClient(this->_fd, password);
+	if (code != SUCCESS)
 	{
-		this->_server->sendResponse(this->_fd, Response::ERRjoinFailed(this->_nickname, channelName));
+		this->_server->sendResponse(this->_fd, Response::ERRjoinFailed(this->_nickname, channelName, code));
 		return ;
 	}
 	this->_channels.push_back(channel);

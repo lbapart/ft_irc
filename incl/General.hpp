@@ -3,6 +3,9 @@
 
 # define ERROR 1
 # define SUCCESS 0
+# define ERR_CHANNELISFULL 471
+# define ERR_BADCHANNELKEY 475
+# define ERR_INVITEONLYCHAN 473
 
 #include <string>
 #include "Response.hpp"

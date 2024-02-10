@@ -27,7 +27,7 @@ class Response
 		// Successful join, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
 		static const std::string	OKjoinSuccess(const std::string& nickname, const std::string& channel);
 		// Failed join, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
-		static const std::string	ERRjoinFailed(const std::string& nickname, const std::string& channel);
+		static const std::string	ERRjoinFailed(const std::string& nickname, const std::string& channel, int error);
 
 		// Nick
 		// Successful set of nickname, takes old and new nickname as arguments (const std::string& oldNickname, const std::string& newNickname)

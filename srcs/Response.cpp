@@ -58,9 +58,9 @@ const std::string	Response::OKjoinSuccess(const std::string& nickname, const std
 	return response;
 }
 
-const std::string	Response::ERRjoinFailed(const std::string& nickname, const std::string& channel)
+const std::string	Response::ERRjoinFailed(const std::string& nickname, const std::string& channel, int error)
 {
-	std::string response = ":" + std::string(SERVER_NAME) + " 475 " + nickname + " " + channel + " :No such channel\r\n";
+	std::string response = ":" + std::string(SERVER_NAME) + " " + std::to_string(error) + " " + nickname + " " + channel + " :Cannot join channel (+k)\r\n";
 	return response;
 }
 

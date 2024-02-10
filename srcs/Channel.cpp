@@ -83,12 +83,12 @@ int		Channel::addClient( const int &fd, const std::string &password )
 {
 	// if channel is full
 	if (this->_clients.size() >= this->_userLimit)
-		return ERROR;
+		return ERR_CHANNELISFULL;
 	// if channel is invite only
 	if (this->_inviteOnly)
 	{
 		if (this->_invited.count(fd) == 0)
-			return ERROR;
+			return ERR_INVITEONLYCHAN;
 	}
 	// if user not in channel and is invited or password is correct
 	if (this->_clients.count(fd) == 0 && (this->isInvited(fd) || this->_password == password))
@@ -97,7 +97,7 @@ int		Channel::addClient( const int &fd, const std::string &password )
 		this->removeInvite(fd);
 		return SUCCESS;
 	}
-	return ERROR;
+	return ERR_BADCHANNELKEY;
 }
 
 int		Channel::removeClient( const int &fd )
