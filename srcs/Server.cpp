@@ -92,4 +92,3 @@ Channel*	Server::getChannel(const std::string& channelName)
 		return NULL;
 	return &this->_channels[channelName];
 }
-
