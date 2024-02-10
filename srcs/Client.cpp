@@ -127,3 +127,23 @@ void		Client::joinChannel(const std::string& channelName, const std::string& pas
 	this->_server->sendResponse(this->_fd, Response::OKjoinSuccess(this->_nickname, channelName));
 	this->_channels.back()->postMessageInChannel(this->_nickname, "has joined the channel");
 }
+
+void		Client::leaveChannel(const std::string& channelName)
+{
+	// check if user is in this channel
+	for (std::vector<Channel *>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
+	{
+		// if user is in this channel remove him from it
+		if ((*it)->getName() == channelName)
+		{
+			(*it)->removeClient(this->_fd);
+			(*it)->removeOperator(this->_fd);
+			(*it)->removeInvite(this->_fd);
+			this->_server->sendResponse(this->_fd, Response::OKleaveSuccess(this->_nickname, channelName));
+			(*it)->postMessageInChannel(this->_nickname, "has left the channel");
+			this->_channels.erase(it);
+			return ;
+		}
+	}
+	this->_server->sendResponse(this->_fd, Response::ERRleaveFailed(this->_nickname, channelName));
+}

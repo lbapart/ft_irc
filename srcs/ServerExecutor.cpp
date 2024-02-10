@@ -33,7 +33,7 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
     	"KICK",
     	"QUIT",
     	"INVITE",
-    	"LEAVE"
+    	"PART"
 	};
 
 
@@ -82,6 +82,13 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 		case (9) : // INVITE
 			break;
 		case (10):   // LEAVE
+			{
+				std::istringstream iss(line);
+				std::string channelName;
+				std::getline(iss, channelName, ' ');
+				std::getline(iss, channelName, ' ');
+				client.leaveChannel(channelName);
+			}
 			break;
 		default:
 			break;
