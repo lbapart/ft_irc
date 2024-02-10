@@ -125,15 +125,18 @@ const std::string	Response::ERRinviteFailed(const std::string& nickname, const s
 	return response;
 }
 
-const std::string	Response::OKkickSuccess(const std::string& nickname, const std::string& channel)
+// :vfrants!vfrants@localhost KICK #tst vfrants_ :Kicked by the channel's operator
+
+const std::string	Response::OKkickSuccess(const std::string& nickname, const std::string& username, const std::string& kickedUsername, const std::string& channel, const std::string& reason)
 {
-	std::string response = ":" + std::string(SERVER_NAME) + " 441 " + nickname + " " + channel + " :Kicked successfully\r\n";
+	std::string response = ":" + nickname + "!" + username + "@localhost KICK " + channel + " " + kickedUsername + " :" + reason + "\r\n";
 	return response;
 }
 
-const std::string	Response::ERRkickFailed(const std::string& nickname, const std::string& channel)
+// test with 403 as error
+const std::string	Response::ERRkickFailed(const std::string& nickname, const std::string& command, int error)
 {
-	std::string response = ":" + std::string(SERVER_NAME) + " 443 " + nickname + " " + channel + " :Kick failed\r\n";
+	std::string response = ":" + std::string(SERVER_NAME) + " " + std::to_string(error) + " " + nickname + " :" + command + " :Kick failed\r\n";
 	return response;
 }
 
@@ -260,5 +263,11 @@ const std::string	Response::ERRtakeOperatorStatusFailed(const std::string& nickn
 const std::string	Response::ERRunknownCommand(const std::string& nickname, const std::string& command)
 {
 	std::string response = ":" + std::string(SERVER_NAME) + " 421 " + nickname + " " + command + " :Unknown command\r\n";
+	return response;
+}
+
+const std::string	Response::ERRmsgToChannel(const std::string& nickname, const std::string& command, const std::string& message)
+{
+	std::string response = ":" + std::string(SERVER_NAME) + " 482 " + nickname + " " + command + " :" + message + "\r\n";
 	return response;
 }

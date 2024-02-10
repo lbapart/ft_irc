@@ -96,6 +96,15 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 			}
 			break;
 		case (7) : // KICK
+			{
+				std::istringstream iss(line);
+				std::string channelName, username, reason;
+				std::getline(iss, channelName, ' ');
+				std::getline(iss, channelName, ' ');
+				std::getline(iss, username, ' ');
+				reason = line.substr(line.find(":") + 1);
+				client.kickUser(channelName, username, reason);
+			}
 			break;
 		case (8) : // QUIT
 			break;

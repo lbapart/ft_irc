@@ -128,6 +128,12 @@ void		Client::pong( void )
 
 void		Client::joinChannel(const std::string& channelName, const std::string& password)
 {
+	// // if username has a non valid character, replace it with '_'
+	// // valid characters are: [a-zA-Z0-9_]
+	// for (size_t i = 0; i < nickname.size(); ++i)
+	// 	if (!(std::isalnum(nickname[i]) || nickname[i] == '_')) // TODO: maybe we need to add '-' to the valid characters -------------------------------------
+	// 		nickname[i] = '_';
+
 	// check if user is already in this channel
 	if (this->_channels.size() > 0)
 	{
@@ -218,4 +224,31 @@ void	Client::sendPrvMsg(const std::string& nickname, const std::string& message)
 		return ;
 	}
 	this->_server->sendResponse(this->_server->getClientIdByNickname(nickname), Response::OKprivateMessageSuccess(this->_nickname, nickname, message));
+}
+
+void	Client::kickUser(const std::string& channelName, const std::string& nickname, const std::string& reason)
+{
+	Channel *channel = this->_server->getChannel(channelName);
+
+	if (channel == NULL)
+	{
+		this->_server->sendResponse(this->_fd, Response::ERRkickFailed(this->_nickname, "KICK", 403));
+		return ;
+	}
+	if (!channel->isOperator(this->_fd))
+	{
+		this->_server->sendResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "You are not an operator"));
+		return ;
+	}
+	if (!channel->isClient(this->_server->getClientIdByNickname(nickname)))
+	{
+		this->_server->sendResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "User is not in the channel"));
+		return ;
+	}
+	channel->removeClient(this->_server->getClientIdByNickname(nickname));
+	Client& kickedClient = this->_server->getClient(this->_server->getClientIdByNickname(nickname));
+	kickedClient.leaveChannel(channelName);
+	channel->brodcastResponse(Response::OKkickSuccess(this->_nickname, this->_username, nickname, channelName, reason));
+	// this->_server->sendResponse(this->_server->getClientIdByUsername(username), Response::OKkickSuccess(this->_nickname, channelName, reason));
+	// channel->postMessageInChannel(this->_nickname, this->_username, "has kicked " + username + " from the channel");
 }

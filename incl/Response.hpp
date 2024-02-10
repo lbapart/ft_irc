@@ -58,10 +58,10 @@ class Response
 		static const std::string	ERRinviteFailed(const std::string& nickname, const std::string& channel);
 
 		// Kick
-		// Successful kick, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
-		static const std::string	OKkickSuccess(const std::string& nickname, const std::string& channel);
-		// Failed kick, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
-		static const std::string	ERRkickFailed(const std::string& nickname, const std::string& channel);
+		// Successful kick, takes nickname, username, kickedUsername, channel and reason as arguments (const std::string& nickname, const std::string& username, const std::string& kickedUsername, const std::string& channel, const std::string& reason)
+		static const std::string	OKkickSuccess(const std::string& nickname, const std::string& username, const std::string& kickedUsername, const std::string& channel, const std::string& reason);
+		// Failed kick, takes nickname, channel and username as arguments (const std::string& nickname, const std::string& channel, const std::string& username)
+		static const std::string	ERRkickFailed(const std::string& nickname, const std::string& command, int error);
 
 		// Set / view channel topic
 		// Successful set channel topic, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
@@ -112,6 +112,8 @@ class Response
 		// Failed take operator status, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
 		static const std::string	ERRtakeOperatorStatusFailed(const std::string& nickname, const std::string& channel);
 
+		// Successful give voice status, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
+		static const std::string	ERRmsgToChannel(const std::string& nickname, const std::string& command, const std::string& message);
 		// Unkown command
 		// Failed unknown command, takes nickname and command as arguments (const std::string& nickname, const std::string& command)
 		static const std::string	ERRunknownCommand(const std::string& nickname, const std::string& command);
