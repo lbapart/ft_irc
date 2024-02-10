@@ -135,6 +135,22 @@ std::string				Server::getAvailableNickname(const std::string& nickname)
 	return resNickname;
 }
 
+void	Server::deleteClient(const int& fd)
+{
+	this->_clients.erase(fd);
+	for (std::vector<pollfd>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++)
+	{
+		if (it->fd == fd)
+		{
+			this->_fds.erase(it);
+			break ;
+		}
+	}
+	for (std::map<std::string, Channel>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
+		it->second.removeClient(fd);
+	close(fd);
+}
+
 std::map<int, Client>&	Server::getClients()
 {
 	return this->_clients;

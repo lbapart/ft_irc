@@ -105,16 +105,13 @@ void		Client::checkAndSetAuthentificated()
 {
 	if (!(this->_isPasswordSet && this->_isUsernameSet && this->_isNicknameSet))
 		return ;
-	std::cout << "fd: " << this->_fd << std::endl;
 	if (this->_password == this->_server->getPassword())
 	{
 		this->_isAuthentificated = true;
-		std::cout << "If you see this, it means that the password is correct" << std::endl;
 		this->_server->sendResponse(this->_fd, Response::OKconnectionSuccess(this->_nickname));
 	}
 	else
 	{
-		std::cout << "If you see this, it means that the password is incorrect" << std::endl;
 		this->_server->sendResponse(this->_fd, Response::ERRconnectionInvalidPassword(this->_nickname));
 		this->_isAuthentificated = false;
 	}
@@ -306,4 +303,16 @@ void	Client::inviteUser(const std::string& nickname, const std::string& channelN
 	}
 	channel->addInvite(fd);
 	this->_server->sendResponse(this->_server->getClientIdByNickname(nickname), Response::OKinviteSuccess(this->_nickname, this->_username, nickname, channelName));
+}
+
+void	Client::quit(const std::string& reason)
+{
+	for (std::vector<Channel *>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
+	{
+		std::string response = Response::OKmessageSuccess(this->_nickname, this->_username, (*it)->getName(), "has quit the server (" + reason + ")");
+		(*it)->brodcastResponse(response);
+		(*it)->removeClient(this->_fd);
+	}
+	this->_server->sendResponse(this->_fd, Response::OKquitSuccess(this->_nickname,this->_username, reason));
+	this->_server->deleteClient(this->_fd);
 }

@@ -16,8 +16,8 @@ int	Server::pollinEvent(const int &fd, std::vector<pollfd> &fds)
 		std::string message;
 		if (this->getClientMessage(fd, message) == ERROR)
 			return (ERROR);
-		this->executeCommands(fd, message);
 		std::cout << "Message: " << message << std::endl;
+		this->executeCommands(fd, message);
 	}
 	return (SUCCESS);
 }
@@ -45,7 +45,7 @@ void	Server::run()
 			if (it->revents & POLLIN)
 			{
 				if (this->pollinEvent(it->fd, temp) == ERROR)
-					continue ;
+					break ;
 			}
 			else if (it->revents & POLLOUT)
 			{

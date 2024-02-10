@@ -45,10 +45,8 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 	switch (index) {
 		case (0) :
 			client.setPassword(line.substr(5));
-			std::cout << '\'' << line.substr(5) << '\'' << std::endl;
 			break;
 		case (1) : // NICK
-			std::cout << '\'' << line.substr(5) << '\'' << std::endl;
 			client.setNickname(line.substr(5));
 			break;
 		case (2) : // Ping
@@ -60,7 +58,6 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 				std::string token;
 				std::getline(iss, token, ' ');
 				std::getline(iss, token, ' ');
-				std::cout << '\'' << token << '\'' << std::endl;
 				client.setUsername(token);
 			}
 			break;
@@ -107,6 +104,10 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 			}
 			break;
 		case (8) : // QUIT
+			{
+				std::string reason = line.substr(line.find(":") + 1);
+				client.quit(reason);
+			}
 			break;
 		case (9) : // INVITE
 			{
@@ -136,7 +137,6 @@ void	Server::executeCommands( const int &fd, const std::string &line ) {
 	std::vector<std::string> cmds = parseLines(line);
 
 	for (std::vector<std::string>::iterator it = cmds.begin(); it != cmds.end(); it++) {
-		std::cout << "Command: " << *it << std::endl;
 		executeCommand(fd, *it, this);
 	}
 

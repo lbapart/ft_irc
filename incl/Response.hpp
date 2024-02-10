@@ -113,6 +113,11 @@ class Response
 		// Failed take operator status, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)
 		static const std::string	ERRtakeOperatorStatusFailed(const std::string& nickname, const std::string& channel);
 
+		// Quit
+		// Successful quit, takes nickname and reason as arguments (const std::string& nickname, const std::string& reason)
+		static const std::string	OKquitSuccess(const std::string& nickname, const std::string& username, const std::string& reason);
+
+
 		// Beautiful error messages
 		static const std::string	ERRmsgToChannel(const std::string& nickname, const std::string& command, const std::string& message);
 		static const std::string	ERRmsgToUser(const std::string& nickname, const std::string& command, const std::string& message);

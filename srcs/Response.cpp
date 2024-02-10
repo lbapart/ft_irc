@@ -277,3 +277,9 @@ const std::string	Response::ERRmsgToUser(const std::string& nickname, const std:
 	std::string response = ":" + std::string(SERVER_NAME) + " 403 " + nickname + " :" + command + " :" + message + "\r\n";
 	return response;
 }
+
+const std::string	Response::OKquitSuccess(const std::string& nickname, const std::string& username, const std::string& reason)
+{
+	std::string response = ":" + nickname + "!" + username + "@localhost QUIT :" + reason + "\r\n";
+	return response;
+}
