@@ -92,3 +92,45 @@ Channel*	Server::getChannel(const std::string& channelName)
 		return NULL;
 	return &this->_channels[channelName];
 }
+
+// helping methods
+
+bool		Server::existByUsername(const std::string& username)
+{
+	for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+	{
+		if (it->second.getUsername() == username)
+			return true;
+	}
+	return false;
+}
+
+bool		Server::existByNickname(const std::string& nickname)
+{
+	for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+	{
+		if (it->second.getNickname() == nickname)
+			return true;
+	}
+	return false;
+}
+
+std::string	Server::getAvailableUsername(const std::string& username)
+{
+	std::string resUsername = username;
+	while (this->existByUsername(resUsername))
+	{
+		resUsername += "🤡";
+	}
+	return resUsername;
+}
+
+std::string	Server::getAvailableNickname(const std::string& nickname)
+{
+	std::string resNickname = nickname;
+	while (this->existByNickname(resNickname))
+	{
+		resNickname += "🤡";
+	}
+	return resNickname;
+}

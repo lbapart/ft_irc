@@ -41,16 +41,16 @@ std::string Client::getPassword() const
 	return this->_password;
 }
 
-void Client::setUsername(const std::string& username)
+void 		Client::setUsername(const std::string& username)
 {
-	this->_username = username;
+	this->_username = this->_server->getAvailableUsername(username);
 	this->_isUsernameSet = true;
 	this->checkAndSetAuthentificated();
 }
 
 void Client::setNickname(const std::string& nickname)
 {
-	this->_nickname = nickname;
+	this->_nickname = this->_server->getAvailableNickname(nickname);
 	this->_isNicknameSet = true;
 	this->checkAndSetAuthentificated();
 }
