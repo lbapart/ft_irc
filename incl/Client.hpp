@@ -23,6 +23,7 @@ class Client
 		bool							_isPasswordSet;
 		bool							_isUsernameSet;
 		bool							_isNicknameSet;
+		std::string						_buffer;
 		std::vector<Channel *>			_channels;
 		Server*							_server;
 	public:
@@ -34,10 +35,12 @@ class Client
 		std::string		getUsername() const;
 		std::string		getNickname() const;
 		std::string		getPassword() const;
+		std::string		getBuffer() const;
 
 		void			setUsername(std::string username);
 		void			setNickname(std::string nickname);
 		void			setPassword(const std::string& password);
+		void			setBuffer(std::string buffer);
 
 		//methods
 		void			pong( void );

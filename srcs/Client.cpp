@@ -10,6 +10,7 @@ Client::Client(int fd, Server *serv)
 	this->_isUsernameSet = false;
 	this->_isNicknameSet = false;
 	this->_server = serv;
+	this->_buffer = "";
 }
 
 Client::~Client() {}
@@ -36,6 +37,11 @@ std::string Client::getNickname() const
 std::string Client::getPassword() const
 {
 	return this->_password;
+}
+
+std::string Client::getBuffer() const
+{
+	return this->_buffer;
 }
 
 void 		Client::setUsername(std::string username)
@@ -69,7 +75,7 @@ void Client::setNickname(std::string nickname)
 	// otherwise, change it
 	std::string newNickname = std::string(nickname.begin(), nickname.end());
 	if (this->_server->existByNickname(newNickname))
-		this->_server->sendResponse(this->_fd, Response::ERRnickSetupFailed(this->_nickname, newNickname));
+		this->_server->prepareResponse(this->_fd, Response::ERRnickSetupFailed(this->_nickname, newNickname));
 	else
 	{
 		for (std::vector<Channel *>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
@@ -79,7 +85,7 @@ void Client::setNickname(std::string nickname)
 		}
 		for (std::map<int, Client>::iterator it = this->_server->getClients().begin(); it != this->_server->getClients().end(); it++)
 		{
-			this->_server->sendResponse(it->second.getFd(), Response::OKnickSetupSuccess(this->_nickname, newNickname, this->_username));
+			this->_server->prepareResponse(it->second.getFd(), Response::OKnickSetupSuccess(this->_nickname, newNickname, this->_username));
 		}
 		this->_nickname = newNickname;
 	}
@@ -92,6 +98,11 @@ void Client::setPassword(const std::string& password)
 	this->checkAndSetAuthentificated();
 }
 
+void Client::setBuffer(std::string buffer)
+{
+	this->_buffer = buffer;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 // Command Handler
 
@@ -102,11 +113,11 @@ void		Client::checkAndSetAuthentificated()
 	if (this->_password == this->_server->getPassword())
 	{
 		this->_isAuthentificated = true;
-		this->_server->sendResponse(this->_fd, Response::OKconnectionSuccess(this->_nickname));
+		this->_server->prepareResponse(this->_fd, Response::OKconnectionSuccess(this->_nickname));
 	}
 	else
 	{
-		this->_server->sendResponse(this->_fd, Response::ERRconnectionInvalidPassword(this->_nickname));
+		this->_server->prepareResponse(this->_fd, Response::ERRconnectionInvalidPassword(this->_nickname));
 		this->_isAuthentificated = false;
 	}
 }
@@ -115,7 +126,7 @@ void		Client::checkAndSetAuthentificated()
 
 void		Client::pong( void )
 {
-	this->_server->sendResponse(this->_fd, "PONG :localhost\r\n");
+	this->_server->prepareResponse(this->_fd, "PONG :localhost\r\n");
 }
 
 void		Client::joinChannel(const std::string& channelName, const std::string& password)
@@ -145,7 +156,7 @@ void		Client::joinChannel(const std::string& channelName, const std::string& pas
 	if (channel == NULL)
 	{
 		this->_channels.push_back(this->_server->addChannel(channelName, password, this->_fd));
-		this->_server->sendResponse(this->_fd, Response::OKjoinSuccess(this->_nickname, this->_username, channelName));
+		this->_server->prepareResponse(this->_fd, Response::OKjoinSuccess(this->_nickname, this->_username, channelName));
 		std::string response = Response::OKmessageSuccess(this->_nickname, this->_username, channelName, "has joined the channel");
 		this->_channels.back()->brodcastResponse(response);
 		return ;
@@ -154,15 +165,15 @@ void		Client::joinChannel(const std::string& channelName, const std::string& pas
 	int code = channel->addClient(this->_fd, password);
 	if (code != SUCCESS)
 	{
-		this->_server->sendResponse(this->_fd, Response::ERRjoinFailed(this->_nickname, channelName, code));
+		this->_server->prepareResponse(this->_fd, Response::ERRjoinFailed(this->_nickname, channelName, code));
 		return ;
 	}
 	this->_channels.push_back(channel);
-	this->_server->sendResponse(this->_fd, Response::OKjoinSuccess(this->_nickname, this->_username, channelName));
+	this->_server->prepareResponse(this->_fd, Response::OKjoinSuccess(this->_nickname, this->_username, channelName));
 	std::string response = Response::OKmessageSuccess(this->_nickname, this->_username, channel->getName(), "has joined the channel");
 	this->_channels.back()->brodcastResponse(response);
 	if (channel->getTopic() != "")
-		this->_server->sendResponse(this->_fd, Response::OKsetChannelTopicSuccess(this->_nickname, channelName, channel->getTopic()));
+		this->_server->prepareResponse(this->_fd, Response::OKsetChannelTopicSuccess(this->_nickname, channelName, channel->getTopic()));
 }
 
 void		Client::leaveChannel(const std::string& channelName)
@@ -176,7 +187,7 @@ void		Client::leaveChannel(const std::string& channelName)
 			(*it)->removeClient(this->_fd);
 			(*it)->removeOperator(this->_fd);
 			(*it)->removeInvite(this->_fd);
-			this->_server->sendResponse(this->_fd, Response::OKleaveSuccess(this->_nickname, this->_username, channelName));
+			this->_server->prepareResponse(this->_fd, Response::OKleaveSuccess(this->_nickname, this->_username, channelName));
 			std::string response = Response::OKmessageSuccess(this->_nickname, this->_username, (*it)->getName(), "has left the channel");
 			(*it)->brodcastResponse(response);
 			std::cout << '\'' << this->_nickname << '\'' << " has left the channel" << std::endl;
@@ -184,7 +195,7 @@ void		Client::leaveChannel(const std::string& channelName)
 			return ;
 		}
 	}
-	this->_server->sendResponse(this->_fd, Response::ERRleaveFailed(this->_nickname, channelName));
+	this->_server->prepareResponse(this->_fd, Response::ERRleaveFailed(this->_nickname, channelName));
 }
 
 void	Client::setTopic(const std::string& channelName, const std::string& topic) {
@@ -192,17 +203,17 @@ void	Client::setTopic(const std::string& channelName, const std::string& topic) 
 
 	if (channel == NULL)
 	{
-		this->_server->sendResponse(this->_fd, Response::ERRsetChannelTopicFailed(this->_nickname, channelName));
+		this->_server->prepareResponse(this->_fd, Response::ERRsetChannelTopicFailed(this->_nickname, channelName));
 		return ; // TODo: maybe we need to send a different response
 	}
 	if (!channel->isClient(this->_fd))
 	{
-		this->_server->sendResponse(this->_fd, Response::ERRsetChannelTopicFailed(this->_nickname, channelName));
+		this->_server->prepareResponse(this->_fd, Response::ERRsetChannelTopicFailed(this->_nickname, channelName));
 		return ;
 	}
 	if (channel->isTopicRestricted() && !channel->isOperator(this->_fd))
 	{
-		this->_server->sendResponse(this->_fd, Response::ERRsetChannelTopicFailed(this->_nickname, channelName));
+		this->_server->prepareResponse(this->_fd, Response::ERRsetChannelTopicFailed(this->_nickname, channelName));
 		return ;
 	}
 	channel->setTopic(topic);
@@ -215,9 +226,9 @@ void	Client::sendPrvMsg(const std::string& nickname, const std::string& message)
 	{
 		bool	client = this->_server->existByNickname(nickname);
 		if (client == false)
-			this->_server->sendResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "User does not exist"));
+			this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "User does not exist"));
 		else
-			this->_server->sendResponse(this->_server->getClientIdByNickname(nickname), Response::OKprivateMessageSuccess(this->_nickname, nickname, message));
+			this->_server->prepareResponse(this->_server->getClientIdByNickname(nickname), Response::OKprivateMessageSuccess(this->_nickname, nickname, message));
 	}
 	else
 	{
@@ -226,7 +237,7 @@ void	Client::sendPrvMsg(const std::string& nickname, const std::string& message)
 		if (channel != NULL)
 		{
 			if (!channel->isClient(this->_fd))
-				this->_server->sendResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "You are not in the channel"));
+				this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "You are not in the channel"));
 			else
 			{
 				std::string response = Response::OKmessageSuccess(this->_nickname, this->_username, channel->getName(), message);
@@ -235,7 +246,7 @@ void	Client::sendPrvMsg(const std::string& nickname, const std::string& message)
 		}
 		else
 		{
-			this->_server->sendResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "Channel does not exist"));
+			this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "Channel does not exist"));
 		}
 	}
 }
@@ -246,17 +257,17 @@ void	Client::kickUser(const std::string& channelName, const std::string& nicknam
 
 	if (channel == NULL || !channel->isClient(this->_fd))
 	{
-		this->_server->sendResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "KICK", "You are not in the channel"));
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "KICK", "You are not in the channel"));
 		return ;
 	}
 	if (!channel->isOperator(this->_fd))
 	{
-		this->_server->sendResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "You are not an operator"));
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "You are not an operator"));
 		return ;
 	}
 	if (!channel->isClient(this->_server->getClientIdByNickname(nickname)))
 	{
-		this->_server->sendResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "User is not in the channel"));
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "User is not in the channel"));
 		return ;
 	}
 	channel->removeClient(this->_server->getClientIdByNickname(nickname));
@@ -271,32 +282,32 @@ void	Client::inviteUser(const std::string& nickname, const std::string& channelN
 
 	if (channel == NULL || !channel->isClient(this->_fd))
 	{
-		this->_server->sendResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "INVITE", "You are not in the channel"));
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "INVITE", "You are not in the channel"));
 		return ;
 	}
 	// if (!channel->isOperator(this->_fd))
 	// {
-	// 	this->_server->sendResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "You are not an operator"));
+	// 	this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "You are not an operator"));
 	// 	return ;
 	// }
 	if (channel->isClient(this->_server->getClientIdByNickname(nickname)))
 	{
-		this->_server->sendResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "User is already in the channel"));
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "User is already in the channel"));
 		return ;
 	}
 	if (channel->isInvited(this->_server->getClientIdByNickname(nickname)))
 	{
-		this->_server->sendResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "User is already invited"));
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "User is already invited"));
 		return ;
 	}
 	int fd = this->_server->getClientIdByNickname(nickname);
 	if (fd == -1)
 	{
-		this->_server->sendResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "User does not exist"));
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "User does not exist"));
 		return ;
 	}
 	channel->addInvite(fd);
-	this->_server->sendResponse(this->_server->getClientIdByNickname(nickname), Response::OKinviteSuccess(this->_nickname, this->_username, nickname, channelName));
+	this->_server->prepareResponse(this->_server->getClientIdByNickname(nickname), Response::OKinviteSuccess(this->_nickname, this->_username, nickname, channelName));
 }
 
 void	Client::quit(const std::string& reason)
@@ -307,6 +318,6 @@ void	Client::quit(const std::string& reason)
 		(*it)->brodcastResponse(response);
 		(*it)->removeClient(this->_fd);
 	}
-	this->_server->sendResponse(this->_fd, Response::OKquitSuccess(this->_nickname,this->_username, reason));
+	this->_server->prepareResponse(this->_fd, Response::OKquitSuccess(this->_nickname,this->_username, reason));
 	this->_server->deleteClient(this->_fd);
 }

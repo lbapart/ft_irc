@@ -168,7 +168,7 @@ void	Channel::postMessageInChannel( const std::string &message, const int &fd )
 	for (std::set<int>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 	{
 		if (*it != fd)
-			this->_server->sendResponse(*it, message);
+			this->_server->prepareResponse(*it, message);
 	}
 }
 
@@ -176,6 +176,6 @@ void	Channel::brodcastResponse( const std::string &response )
 {
 	for (std::set<int>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 	{
-		this->_server->sendResponse(*it, response);
+		this->_server->prepareResponse(*it, response);
 	}
 }

@@ -47,7 +47,8 @@ class Server
 		~Server();
 
 		void		run();
-		void		sendResponse(int fd, const std::string& response);
+		void		flushResponse(int fd);
+		void		prepareResponse(int fd, const std::string& response);
 		void		executeCommands( const int &fd, const std::string &line );
 
 		Channel*	addChannel(const std::string& channelName, const std::string& password, const int& fd);

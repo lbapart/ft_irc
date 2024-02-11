@@ -25,6 +25,13 @@ run		:
 		@echo '/connect 127.0.0.1 1111 1234'
 		./${NAME} 1111 1234
 
+test	:
+		@make --no-print-directory re
+		@make --no-print-directory clean
+		@clear;
+		@echo '/connect 127.0.0.1 1111 1234'
+		valgrind --track-fds=yes ./${NAME} 1111 1234
+
 $(NAME)	: $(OBJS)
 		$(CXX) -o $@ $^
 
@@ -44,4 +51,4 @@ re		:
 
 -include $(DEPS)
 
-.PHONY: all clean fclean re run
+.PHONY: all clean fclean re run test

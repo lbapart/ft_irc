@@ -29,7 +29,7 @@ void	Server::run()
 			}
 			else if (it->revents & POLLOUT)
 			{
-				// std::cout << "Client is ready to receive a message" << std::endl;
+				this->flushResponse(it->fd);
 			}
 			else if (it->revents & POLLHUP)
 			{
