@@ -1,7 +1,5 @@
 #include "General.hpp"
 
-//Constructor && Destructor
-
 Server::Server(ushort port, const std::string& password)
 {
 	this->_port = port;
@@ -29,66 +27,141 @@ Server::Server(ushort port, const std::string& password)
 
 Server::~Server()
 {
+	for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+		close(it->first);
 	close(this->_socket);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 //Exceptions
 
-const char* Server::SendException::what() const throw()
+const char*				Server::SendException::what() const throw()
 {
 	return "Send failure";
 }
 
-const char* Server::PollException::what() const throw()
+const char*				Server::PollException::what() const throw()
 {
 	return "Poll failure";
 }
 
-const char*	Server::SocketCreationException::what() const throw()
+const char*				Server::SocketCreationException::what() const throw()
 {
 	return "Socket creation failure";
 }
 
-const char*	Server::SocketBindException::what() const throw()
+const char*				Server::SocketBindException::what() const throw()
 {
 	return "Socket bind failure";
 }
 
-const char*	Server::SocketListenException::what() const throw()
+const char*				Server::SocketListenException::what() const throw()
 {
 	return "Socket listen failure";
 }
 
-const char*	Server::AcceptException::what() const throw()
+const char*				Server::AcceptException::what() const throw()
 {
 	return "Socket accept failure";
 }
 
-std::string		Server::getPassword() const
+std::string				Server::getPassword() const
 {
 	return this->_password;
 }
 
-Client&			Server::getClient(int fd)
+Client&					Server::getClient(int fd)
 {
 	return this->_clients[fd];
 }
 
-Channel*		Server::addChannel(const std::string& channelName, const std::string& password, const int& fd)
+Channel*				Server::addChannel(const std::string& channelName, const std::string& password, const int& fd)
 {
 	this->_channels[channelName] = Channel(channelName, password, fd, this);
 	return &this->_channels[channelName];
 }
 
-void		Server::removeChannel(const std::string& channelName)
+void					Server::removeChannel(const std::string& channelName)
 {
 	this->_channels.erase(channelName);
 }
 
-Channel*	Server::getChannel(const std::string& channelName)
+Channel*				Server::getChannel(const std::string& channelName)
 {
 	if (this->_channels.find(channelName) == this->_channels.end())
 		return NULL;
 	return &this->_channels[channelName];
+}
+
+// helping methods
+
+bool					Server::existByUsername(const std::string& username)
+{
+	for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+	{
+		if (it->second.getUsername() == username)
+			return true;
+	}
+	return false;
+}
+
+bool					Server::existByNickname(const std::string& nickname)
+{
+	for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+	{
+		if (it->second.getNickname() == nickname)
+			return true;
+	}
+	return false;
+}
+
+std::string				Server::getAvailableUsername(const std::string& username)
+{
+	std::string resUsername = username;
+	while (this->existByUsername(resUsername))
+	{
+		resUsername += "🤡";
+	}
+	return resUsername;
+}
+
+std::string				Server::getAvailableNickname(const std::string& nickname)
+{
+	std::string resNickname = nickname;
+	while (this->existByNickname(resNickname))
+	{
+		resNickname += "🤡";
+	}
+	return resNickname;
+}
+
+void	Server::deleteClient(const int& fd)
+{
+	this->_clients.erase(fd);
+	for (std::vector<pollfd>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++)
+	{
+		if (it->fd == fd)
+		{
+			this->_fds.erase(it);
+			break ;
+		}
+	}
+	for (std::map<std::string, Channel>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
+		it->second.removeClient(fd);
+	close(fd);
+}
+
+std::map<int, Client>&	Server::getClients()
+{
+	return this->_clients;
+}
+
+int	Server::getClientIdByNickname(const std::string& nickname)
+{
+	for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+	{
+		if (it->second.getNickname() == nickname)
+			return it->first;
+	}
+	return -1;
 }

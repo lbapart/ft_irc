@@ -7,34 +7,9 @@ int	Server::getClientMessage(int fd, std::string &message)
 	std::memset(buffer, 0, 1024);
 
 	int bytesRead = recv(fd, buffer, 1024, 0);
-	if (bytesRead < 0)
+	if (bytesRead <= 0)
 	{
-		std::cerr << "Error occured during communication with client" << std::endl;
-		this->_clients.erase(fd);
-		for (std::vector<pollfd>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++)
-		{
-			if (it->fd == fd)
-			{
-				this->_fds.erase(it);
-				break ;
-			}
-		}
-		close(fd);
-		return (ERROR);
-	}
-	else if (bytesRead == 0)
-	{
-		std::cout << "Client disconnected" << std::endl; // TODO: createfunction for deleting user form db
-		this->_clients.erase(fd);
-		for (std::vector<pollfd>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++)
-		{
-			if (it->fd == fd)
-			{
-				this->_fds.erase(it);
-				break ;
-			}
-		}
-		close(fd);
+		this->deleteClient(fd);
 		return (ERROR);
 	}
 	else
@@ -55,7 +30,7 @@ void		Server::sendResponse(int fd, const std::string& response)
 			if (errno == EWOULDBLOCK || errno == EAGAIN)
 				continue ;
 			else
-				throw SendException();
+				throw SendException(); //here
 		}
 		bytesSent += sent;
 	}

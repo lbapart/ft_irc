@@ -1,7 +1,4 @@
 #include "General.hpp"
-#include "General.hpp"
-
-#include <iostream>
 
 Channel::Channel() {}
 Channel::Channel( std::string name, std::string password, const int& fd, Server *serv )
@@ -83,12 +80,12 @@ int		Channel::addClient( const int &fd, const std::string &password )
 {
 	// if channel is full
 	if (this->_clients.size() >= this->_userLimit)
-		return ERROR;
+		return ERR_CHANNELISFULL;
 	// if channel is invite only
 	if (this->_inviteOnly)
 	{
 		if (this->_invited.count(fd) == 0)
-			return ERROR;
+			return ERR_INVITEONLYCHAN;
 	}
 	// if user not in channel and is invited or password is correct
 	if (this->_clients.count(fd) == 0 && (this->isInvited(fd) || this->_password == password))
@@ -97,7 +94,7 @@ int		Channel::addClient( const int &fd, const std::string &password )
 		this->removeInvite(fd);
 		return SUCCESS;
 	}
-	return ERROR;
+	return ERR_BADCHANNELKEY;
 }
 
 int		Channel::removeClient( const int &fd )
@@ -166,10 +163,19 @@ bool	Channel::isInvited( const int &fd ) const
 	return (this->_invited.count(fd) == 1);
 }
 
-void	Channel::postMessageInChannel( const std::string& nickname, const std::string &message )
+void	Channel::postMessageInChannel( const std::string &message, const int &fd )
 {
 	for (std::set<int>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 	{
-		this->_server->sendResponse(*it, Response::OKmessageSuccess(nickname, this->_name, message));
+		if (*it != fd)
+			this->_server->sendResponse(*it, message);
+	}
+}
+
+void	Channel::brodcastResponse( const std::string &response )
+{
+	for (std::set<int>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+	{
+		this->_server->sendResponse(*it, response);
 	}
 }

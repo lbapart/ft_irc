@@ -1,9 +1,4 @@
-
-#include "../incl/General.hpp"
-#include <algorithm>
-#include <cstddef>
-#include <iostream>
-#include <sstream>
+#include "General.hpp"
 
 static std::vector<std::string>	parseLines( const std::string &str ) {
 	std::vector<std::string>	result;
@@ -33,7 +28,7 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
     	"KICK",
     	"QUIT",
     	"INVITE",
-    	"LEAVE"
+    	"PART"
 	};
 
 
@@ -50,7 +45,7 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 			client.setNickname(line.substr(5));
 			break;
 		case (2) : // Ping
-			// client.sendToClient("PONG :localhost\r\n");
+			client.pong();
 			break;
 		case (3) : // USER
 			{
@@ -62,8 +57,25 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 			}
 			break;
 		case (4) : // TOPIC
+			{
+				std::istringstream iss(line);
+				std::string channelName, topic;
+				std::getline(iss, channelName, ' ');
+				std::getline(iss, channelName, ' ');
+				std::getline(iss, topic, ' ');
+				topic.assign(topic.begin() + 1, topic.end());
+				client.setTopic(channelName, topic);
+			}
 			break;
 		case (5) : // PRIVMSG
+			{
+				std::istringstream iss(line);
+				std::string username, message;
+				std::getline(iss, username, ' ');
+				std::getline(iss, username, ' ');
+				message = line.substr(line.find(":") + 1);
+				client.sendPrvMsg(username, message);
+			}
 			break;
 		case (6) : // JOIN
 			{
@@ -76,12 +88,40 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 			}
 			break;
 		case (7) : // KICK
+			{
+				std::istringstream iss(line);
+				std::string channelName, username, reason;
+				std::getline(iss, channelName, ' ');
+				std::getline(iss, channelName, ' ');
+				std::getline(iss, username, ' ');
+				reason = line.substr(line.find(":") + 1);
+				client.kickUser(channelName, username, reason);
+			}
 			break;
 		case (8) : // QUIT
+			{
+				std::string reason = line.substr(line.find(":") + 1);
+				client.quit(reason);
+			}
 			break;
 		case (9) : // INVITE
+			{
+				std::istringstream iss(line);
+				std::string nickname, channelName;
+				std::getline(iss, nickname, ' ');
+				std::getline(iss, nickname, ' ');
+				std::getline(iss, channelName, ' ');
+				client.inviteUser(nickname, channelName);
+			}
 			break;
 		case (10):   // LEAVE
+			{
+				std::istringstream iss(line);
+				std::string channelName;
+				std::getline(iss, channelName, ' ');
+				std::getline(iss, channelName, ' ');
+				client.leaveChannel(channelName);
+			}
 			break;
 		default:
 			break;
@@ -92,7 +132,6 @@ void	Server::executeCommands( const int &fd, const std::string &line ) {
 	std::vector<std::string> cmds = parseLines(line);
 
 	for (std::vector<std::string>::iterator it = cmds.begin(); it != cmds.end(); it++) {
-		std::cout << "Command: " << *it << std::endl;
 		executeCommand(fd, *it, this);
 	}
 

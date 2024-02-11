@@ -35,13 +35,22 @@ class Client
 		std::string		getNickname() const;
 		std::string		getPassword() const;
 
-		void			setUsername(const std::string& username);
-		void			setNickname(const std::string& nickname);
+		void			setUsername(std::string username);
+		void			setNickname(std::string nickname);
 		void			setPassword(const std::string& password);
 
 		//methods
 		void			pong( void );
 		void			joinChannel(const std::string& channelName, const std::string& password);
+		void			leaveChannel(const std::string& channelName);
+		void			setTopic(const std::string& channelName, const std::string& topic);
+		void			sendPrvMsg(const std::string& nickname, const std::string& message);
+		void			kickUser(const std::string& channelName, const std::string& username, const std::string& reason);
+		void			inviteUser(const std::string& nickname, const std::string& channelName);
+		void			quit(const std::string& reason);
+
+
+
 		// int				changeChannelTopic(const std::string& topic);
 		// int				kickClientFromChannel(const std::string& nickname);
 		// int 			inviteClientToChannel(const std::string& nickname);

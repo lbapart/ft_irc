@@ -1,28 +1,6 @@
 #include "../incl/Server.hpp"
-#include <algorithm>
 
-int	Server::pollinEvent(const int &fd, std::vector<pollfd> &fds)
-{
-	if (fd == this->_socket) // if socket fd is triggered, then new client tries to connect
-	{
-		std::cout << "New Client tries to connect!\n" << std::endl;
-		int	newClientFd = addClient();
-		if (newClientFd == -1)
-			return (ERROR);
-		else
-			fds.push_back({newClientFd, POLLIN | POLLOUT, 0});
-	}
-	else // if client fd is triggered, then client sent a message
-	{
-		std::cout << "Client sent a message!\n" << std::endl;
-		std::string message;
-		if (this->getClientMessage(fd, message) == ERROR)
-			return (ERROR);
-		this->executeCommands(fd, message);
-		std::cout << "Message: " << message << std::endl;
-	}
-	return (SUCCESS);
-}
+bool	g_running = true;
 
 void	Server::run()
 {
@@ -32,7 +10,7 @@ void	Server::run()
 	//listen function limits the number of pending connections
 	if (listen(this->_socket, 10) == -1)
 		throw SocketListenException();
-	while (1)
+	while (g_running)
 	{
 		std::vector<pollfd>	temp;
 
@@ -47,7 +25,7 @@ void	Server::run()
 			if (it->revents & POLLIN)
 			{
 				if (this->pollinEvent(it->fd, temp) == ERROR)
-					continue ;
+					break ;
 			}
 			else if (it->revents & POLLOUT)
 			{
@@ -62,4 +40,45 @@ void	Server::run()
 
 		this->_fds.insert(this->_fds.end(), temp.begin(), temp.end());
 	}
+}
+
+int	Server::pollinEvent(const int &fd, std::vector<pollfd> &fds)
+{
+	if (fd == this->_socket) // if socket fd is triggered, then new client tries to connect
+	{
+		int	newClientFd = this->addClient();
+		if (newClientFd == -1)
+			return (ERROR);
+		else
+		{
+			pollfd	newClient;
+			newClient.fd = newClientFd;
+			newClient.events = POLLIN | POLLOUT;
+			newClient.revents = 0;
+			fds.push_back(newClient);
+		}
+	}
+	else // if client fd is triggered, then client sent a message
+	{
+		std::string message;
+		if (this->getClientMessage(fd, message) == ERROR)
+			return (ERROR);
+		std::cout << "Message: " << message << std::endl;
+		this->executeCommands(fd, message);
+	}
+	return (SUCCESS);
+}
+
+int	Server::addClient()
+{
+	sockaddr_in clientAddr;
+	socklen_t	clientAddrLen = sizeof(clientAddr);
+
+	int fd = accept(this->_socket, (struct sockaddr *)&clientAddr, &clientAddrLen);
+	if (fd == -1)
+		return (fd);
+
+	this->_clients.insert(std::pair<int, Client>(fd, Client(fd, this)));
+
+	return (fd);
 }

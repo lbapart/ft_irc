@@ -33,6 +33,7 @@ class Server
 		int			addClient( void );
 		int			pollinEvent(const int &fd, std::vector<pollfd> &fds);
 		int			getClientMessage(int fd, std::string &msg);
+		bool		existByUsername(const std::string& username);
 
 		ushort								_port;
 		int									_socket;
@@ -57,6 +58,13 @@ class Server
 		Client&									getClient(int fd);
 		int										getClientIdByNickname(const std::string& nickname);
 		std::string								getPassword() const;
+
+
+		//helping functions
+		void									deleteClient(const int& fd);
+		bool									existByNickname(const std::string& nickname);
+		std::string								getAvailableUsername(const std::string& username);
+		std::string								getAvailableNickname(const std::string& nickname);
 
 		class SocketCreationException : public std::exception
 		{
