@@ -46,11 +46,17 @@ int	Server::pollinEvent(const int &fd, std::vector<pollfd> &fds)
 {
 	if (fd == this->_socket) // if socket fd is triggered, then new client tries to connect
 	{
-		int	newClientFd = addClient();
+		int	newClientFd = this->addClient();
 		if (newClientFd == -1)
 			return (ERROR);
 		else
-			fds.push_back({newClientFd, POLLIN | POLLOUT, 0});
+		{
+			pollfd	newClient;
+			newClient.fd = newClientFd;
+			newClient.events = POLLIN | POLLOUT;
+			newClient.revents = 0;
+			fds.push_back(newClient);
+		}
 	}
 	else // if client fd is triggered, then client sent a message
 	{
