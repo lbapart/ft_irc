@@ -2,7 +2,7 @@ CXX			= c++
 NAME		= ircserv
 RM			= rm -rf
 
-CXXFLAGS	= -Wall -Wextra -Werror -MD -MP -g
+CXXFLAGS	= -Wall -Wextra -Werror -MD -MP -g -std=c++98 -pedantic
 
 MAKEFLAGS	= -j$(nproc)
 

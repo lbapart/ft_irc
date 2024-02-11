@@ -8,16 +8,16 @@
 # define ERR_INVITEONLYCHAN 473
 
 #include <string>
-#include "Response.hpp"
+#include <csignal>
+
 #include "Server.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
+#include "Response.hpp"
 
 class Server;
 class Channel;
 class Client;
-
-#include <csignal>
 
 extern bool g_running;
 

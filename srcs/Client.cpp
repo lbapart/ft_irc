@@ -319,5 +319,6 @@ void	Client::quit(const std::string& reason)
 		(*it)->removeClient(this->_fd);
 	}
 	this->_server->prepareResponse(this->_fd, Response::OKquitSuccess(this->_nickname,this->_username, reason));
+	this->_server->flushResponse(this->_fd);
 	this->_server->deleteClient(this->_fd);
 }

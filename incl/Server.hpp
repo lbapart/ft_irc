@@ -2,25 +2,14 @@
 # define SERVER_HPP
 
 # include <iostream>
-# include <string>
 # include <vector>
 # include <map>
-# include <cstdlib>
-# include <exception>
 # include <sys/socket.h>
 # include <netinet/in.h>
-# include <unistd.h>
 # include <sys/poll.h>
 # include <fcntl.h>
 # include <cstring>
-# include <algorithm>
 # include <sstream>
-# include <iomanip>
-# include <ctime>
-//# include <chrono>
-# include <limits>
-
-# include <cerrno>
 
 # include "General.hpp"
 

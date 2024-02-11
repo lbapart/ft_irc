@@ -4,6 +4,13 @@ Response::Response() {}
 
 Response::~Response() {}
 
+static std::string	to_string(int intValue)
+{
+	std::stringstream ss;
+    ss << intValue;
+    return ss.str();
+}
+
 const std::string	Response::OKconnectionSuccess(const std::string& nickname)
 {
 	std::string response = ":" + std::string(SERVER_NAME) + " 001 " + nickname + " :Welcome to the Internet Relay Network " + nickname + "!" + SERVER_NAME + "@localhost\r\n";
@@ -24,7 +31,7 @@ const std::string	Response::OKjoinSuccess(const std::string& nickname, const std
 
 const std::string	Response::ERRjoinFailed(const std::string& nickname, const std::string& channel, int error)
 {
-	std::string response = ":" + std::string(SERVER_NAME) + " " + std::to_string(error) + " " + nickname + " " + channel + " :Cannot join channel (+k)\r\n";
+	std::string response = ":" + std::string(SERVER_NAME) + " " + to_string(error) + " " + nickname + " " + channel + " :Cannot join channel (+k)\r\n";
 	return response;
 }
 
