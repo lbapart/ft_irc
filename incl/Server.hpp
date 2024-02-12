@@ -52,6 +52,7 @@ class Server
 
 		//helping functions
 		void									deleteClient(const int fd);
+		bool									existByFd(const int fd);
 		bool									existByNickname(const std::string& nickname);
 		std::string								getAvailableUsername(const std::string& username);
 		std::string								getAvailableNickname(const std::string& nickname);

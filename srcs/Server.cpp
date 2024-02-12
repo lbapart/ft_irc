@@ -117,6 +117,11 @@ bool					Server::existByNickname(const std::string& nickname)
 	return false;
 }
 
+bool					Server::existByFd(const int fd)
+{
+	return this->_clients.find(fd) != this->_clients.end();
+}
+
 std::string				Server::getAvailableUsername(const std::string& username)
 {
 	std::string resUsername = username;
