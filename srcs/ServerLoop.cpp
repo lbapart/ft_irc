@@ -24,8 +24,9 @@ void	Server::run()
 		{
 			if (it->revents & POLLIN)
 			{
-				if (this->pollinEvent(it->fd, temp) == ERROR)
-					break ;
+				//if (this->pollinEvent(it->fd, temp) == ERROR)
+				this->pollinEvent(it->fd, temp);
+				break ;
 			}
 			else if (it->revents & POLLOUT)
 			{

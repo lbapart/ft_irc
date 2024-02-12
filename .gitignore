@@ -3,3 +3,4 @@ ircserv
 .vscode
 compile_flags.txt
 .DS_Store
+Dockerfile

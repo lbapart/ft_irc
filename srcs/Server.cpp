@@ -27,8 +27,10 @@ Server::Server(ushort port, const std::string& password)
 
 Server::~Server()
 {
-	for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
-		close(it->first);
+	for (std::vector<pollfd>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++)
+	{
+		close(it->fd);
+	}
 	close(this->_socket);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,7 +137,7 @@ std::string				Server::getAvailableNickname(const std::string& nickname)
 	return resNickname;
 }
 
-void	Server::deleteClient(const int& fd)
+void	Server::deleteClient(const int fd)
 {
 	this->_clients.erase(fd);
 	for (std::vector<pollfd>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++)
