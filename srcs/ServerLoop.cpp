@@ -43,7 +43,7 @@ void	Server::run()
 	}
 }
 
-int	Server::pollinEvent(const int &fd, std::vector<pollfd> &fds)
+int	Server::pollinEvent(const int fd, std::vector<pollfd> &fds)
 {
 	if (fd == this->_socket) // if socket fd is triggered, then new client tries to connect
 	{
@@ -64,8 +64,14 @@ int	Server::pollinEvent(const int &fd, std::vector<pollfd> &fds)
 		std::string message;
 		if (this->getClientMessage(fd, message) == ERROR)
 			return (ERROR);
-		std::cout << "Message: " << message << std::endl;
-		this->executeCommands(fd, message);
+		Client &client = this->getClient(fd);
+		client.setInputBuffer(client.getInputBuffer() + message);
+		if (client.getInputBuffer().find("\r\n") != std::string::npos)
+		{
+			std::cout << "\nReceived: " << client.getInputBuffer() << std::endl;
+			this->executeCommands(fd, message);
+			client.setInputBuffer("");
+		}
 	}
 	return (SUCCESS);
 }

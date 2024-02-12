@@ -1,0 +1,19 @@
+
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME="robbyrussell"
+plugins=(git)
+
+source $ZSH/oh-my-zsh.sh
+
+alias francinette=/home/vfrants/francinette/tester.sh
+alias paco=/home/vfrants/francinette/tester.sh
+
+
+alias form="/home/vfrants/cpp_class_creator/form.sh"
+alias makegen="/home/vfrants/cpp_class_creator/makefile.sh"
+alias ccc-update="/home/vfrants/cpp_class_creator/installer.sh"
+
+alias m="make run"
+alias t="make test"
+alias c="clear"
+alias i="irssi"

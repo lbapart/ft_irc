@@ -20,7 +20,7 @@ class Server
 {
 	private:
 		int			addClient( void );
-		int			pollinEvent(const int &fd, std::vector<pollfd> &fds);
+		int			pollinEvent(const int fd, std::vector<pollfd> &fds);
 		int			getClientMessage(int fd, std::string &msg);
 		bool		existByUsername(const std::string& username);
 

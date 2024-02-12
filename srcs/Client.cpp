@@ -10,7 +10,7 @@ Client::Client(int fd, Server *serv)
 	this->_isUsernameSet = false;
 	this->_isNicknameSet = false;
 	this->_server = serv;
-	this->_buffer = "";
+	this->_outputBuffer = "";
 }
 
 Client::~Client() {}
@@ -39,9 +39,14 @@ std::string Client::getPassword() const
 	return this->_password;
 }
 
-std::string Client::getBuffer() const
+std::string Client::getInputBuffer() const
 {
-	return this->_buffer;
+	return this->_inputBuffer;
+}
+
+std::string Client::getOutputBuffer() const
+{
+	return this->_outputBuffer;
 }
 
 void 		Client::setUsername(std::string username)
@@ -98,9 +103,14 @@ void Client::setPassword(const std::string& password)
 	this->checkAndSetAuthentificated();
 }
 
-void Client::setBuffer(std::string buffer)
+void Client::setInputBuffer(std::string buffer)
 {
-	this->_buffer = buffer;
+	this->_inputBuffer = buffer;
+}
+
+void Client::setOutputBuffer(std::string buffer)
+{
+	this->_outputBuffer = buffer;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

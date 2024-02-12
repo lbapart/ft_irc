@@ -16,19 +16,20 @@ int	Server::getClientMessage(int fd, std::string &message)
 	else
 	{
 		message = buffer;
+		std::cout << "RECV = " << '\'' <<  message << '\'' << std::endl;
 		return (SUCCESS);
 	}
 }
 
 void		Server::flushResponse(int fd)
 {
-	if (this->getClient(fd).getBuffer().empty())
+	if (this->getClient(fd).getOutputBuffer().empty())
 		return ;
 
 	int bytesSent = 0;
-	std::cout << "Sending: " << this->getClient(fd).getBuffer() << std::endl;
-	std::string response = this->getClient(fd).getBuffer();
-	this->getClient(fd).setBuffer("");
+	std::cout << "\nSending: " << this->getClient(fd).getOutputBuffer() << std::endl;
+	std::string response = this->getClient(fd).getOutputBuffer();
+	this->getClient(fd).setOutputBuffer("");
 	while (bytesSent < (int)response.size())
 	{
 		int sent = send(fd, response.c_str() + bytesSent, response.size() - bytesSent, 0);
@@ -41,5 +42,5 @@ void		Server::flushResponse(int fd)
 
 void		Server::prepareResponse(int fd, const std::string& response)
 {
-	this->getClient(fd).setBuffer(this->getClient(fd).getBuffer() + response);
+	this->getClient(fd).setOutputBuffer(this->getClient(fd).getOutputBuffer() + response);
 }
