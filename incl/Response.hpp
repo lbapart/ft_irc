@@ -63,6 +63,8 @@ class Response
 		// Unkown command
 		// Failed unknown command, takes nickname and command as arguments (const std::string& nickname, const std::string& command)
 		static const std::string	ERRunknownCommand(const std::string& nickname, const std::string& command);
+		// Beatiful ok message
+		static const std::string	OKmsgToChannel(const std::string& nickname, const std::string& username, const std::string& command, const std::string& channel, const std::string& message);
 
 };
 

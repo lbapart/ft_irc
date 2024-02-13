@@ -17,7 +17,7 @@ static std::vector<std::string>	parseLines( const std::string &str ) {
 
 static void	executeCommand( const int &fd, const std::string &line, Server *server ) {
 	int				index = 0;
-	std::string		commands[11] = {
+	std::string		commands[12] = {
 		"PASS",
     	"NICK",
     	"PING",
@@ -28,7 +28,8 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
     	"KICK",
     	"QUIT",
     	"INVITE",
-    	"PART"
+    	"PART",
+		"MODE"
 	};
 
 
@@ -121,6 +122,17 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 				std::getline(iss, channelName, ' ');
 				std::getline(iss, channelName, ' ');
 				client.leaveChannel(channelName);
+			}
+			break;
+		case (11):   // MODE
+			{
+				std::istringstream iss(line);
+				std::string channelName, mode, arg;
+				std::getline(iss, channelName, ' ');
+				std::getline(iss, mode, ' ');
+				std::getline(iss, channelName, ' ');
+				std::getline(iss, arg, ' ');
+				client.setMode(channelName, mode, arg);
 			}
 			break;
 		default:

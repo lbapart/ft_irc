@@ -5,6 +5,7 @@
 # include <vector>
 
 # include "General.hpp"
+# define MAX_CHAN_LIMIT 4294967295
 
 class Server;
 class Channel;
@@ -49,6 +50,12 @@ class Client
 		void			kickUser(const std::string& channelName, const std::string& username, const std::string& reason);
 		void			inviteUser(const std::string& nickname, const std::string& channelName);
 		void			quit(const std::string& reason);
+		void			setMode(const std::string& mode, const std::string& channel, const std::string& arg);
+		void			handleInviteMode(const std::string& mode, Channel *chan);
+		void			handleTopicMode(const std::string& mode, Channel *chan);
+		void			handlePasswordMode(const std::string& mode, Channel *chan, const std::string& password);
+		void			handleOperatorMode(const std::string& mode, Channel *chan, const std::string& nickname);
+		void			handleLimitMode(const std::string& mode, Channel *chan, const std::string& limit);
 
 
 

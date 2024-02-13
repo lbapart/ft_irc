@@ -3,13 +3,14 @@
 Channel::Channel() {}
 Channel::Channel( std::string name, std::string password, const int& fd, Server *serv )
 {
+	std::cout << "Channel created " + name << std::endl;
 	this->_name = name;
 	this->_password = password;
 	this->_clients.insert(fd);
 	this->_operators.insert(fd);
 	this->_inviteOnly = false;
 	this->_isTopicRestricted = false;
-	this->_userLimit = 5;
+	this->_userLimit = 4294967295;
 	this->_server = serv;
 }
 Channel::~Channel() {}

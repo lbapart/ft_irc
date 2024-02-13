@@ -322,3 +322,181 @@ void	Client::quit(const std::string& reason)
 	this->_server->flushResponse(this->_fd);
 	this->_server->deleteClient(this->_fd);
 }
+
+void	Client::handleInviteMode(const std::string& mode, Channel *chan)
+{
+	if (mode == "+i")
+	{
+		if (chan->isInviteOnly())
+		{
+			this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, chan->getName(), "Channel is already invite only"));
+			return ;
+		}
+		chan->setInviteOnly(true);
+		chan->brodcastResponse(Response::OKmsgToChannel(this->_nickname, this->_username, "MODE", chan->getName(), "Invite only mode set"));
+	}
+	if (mode == "-i")
+	{
+		if (!chan->isInviteOnly())
+		{
+			this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, chan->getName(), "Channel is not invite only"));
+			return ;
+		}
+		chan->setInviteOnly(false);
+		chan->brodcastResponse(Response::OKmsgToChannel(this->_nickname, this->_username, "MODE", chan->getName(), "Invite only mode unset"));
+	}
+}
+
+
+void	Client::handleTopicMode(const std::string& mode, Channel *chan)
+{
+	if (mode == "+t")
+	{
+		if (chan->isTopicRestricted())
+		{
+			this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, chan->getName(), "Channel topic is already restricted"));
+			return ;
+		}
+		chan->setTopicRestricted(true);
+		chan->brodcastResponse(Response::OKmsgToChannel(this->_nickname, this->_username, "MODE", chan->getName(), "Topic restricted mode set"));
+	}
+	if (mode == "-t")
+	{
+		if (!chan->isTopicRestricted())
+		{
+			this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, chan->getName(), "Channel topic is not restricted"));
+			return ;
+		}
+		chan->setTopicRestricted(false);
+		chan->brodcastResponse(Response::OKmsgToChannel(this->_nickname, this->_username, "MODE", chan->getName(), "Topic restricted mode unset"));
+	}
+}
+
+void	Client::handlePasswordMode(const std::string& mode, Channel *chan, const std::string& password)
+{
+	if (mode == "+k")
+	{
+		if (password == "")
+		{
+			this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, chan->getName(), "Cannot set an empty password"));
+			return ;
+		}
+		chan->setPassword(password);
+		chan->brodcastResponse(Response::OKmsgToChannel(this->_nickname, this->_username, "MODE", chan->getName(), "Password set"));
+	}
+	if (mode == "-k")
+	{
+		if (chan->getPassword() == "")
+		{
+			this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, chan->getName(), "Channel does not have a password"));
+			return ;
+		}
+		chan->setPassword("");
+		chan->brodcastResponse(Response::OKmsgToChannel(this->_nickname, this->_username, "MODE", chan->getName(), "Password unset"));
+	}
+}
+
+void	Client::handleOperatorMode(const std::string& mode, Channel *chan, const std::string& nickname)
+{
+	if (mode == "+o")
+	{
+		if (chan->isOperator(this->_server->getClientIdByNickname(nickname)))
+		{
+			this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, chan->getName(), "User is already an operator"));
+			return ;
+		}
+		if (!chan->isClient(this->_server->getClientIdByNickname(nickname)))
+		{
+			this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, chan->getName(), "User is not in the channel"));
+			return ;
+		}
+		chan->addOperator(this->_server->getClientIdByNickname(nickname));
+		chan->brodcastResponse(Response::OKmsgToChannel(this->_nickname, this->_username, "MODE", chan->getName(), nickname +  " is now an operator"));
+	}
+	if (mode == "-o")
+	{
+		if (!chan->isClient(this->_server->getClientIdByNickname(nickname)))
+		{
+			this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, chan->getName(), "User is not in the channel"));
+			return ;
+		}
+		if (!chan->isOperator(this->_server->getClientIdByNickname(nickname)))
+		{
+			this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, chan->getName(), "User is not an operator"));
+			return ;
+		}
+		chan->removeOperator(this->_server->getClientIdByNickname(nickname));
+		chan->brodcastResponse(Response::OKmsgToChannel(this->_nickname, this->_username, "MODE", chan->getName(), nickname + " is no longer an operator"));
+	}
+}
+
+static bool isValidLimit(const std::string& limit)
+{
+	if (limit.size() == 0)
+		return false;
+	for (size_t i = 0; i < limit.size(); ++i)
+	{
+		if (!std::isdigit(limit[i]))
+			return false;
+		if (i == 9 && i + 1 != limit.size())
+			return false;
+		if (i == 9 && i + 1 == limit.size() && limit > "4294967295")
+			return false;
+		if (i == 10)
+			return false;
+	}
+	return true;
+}
+
+void	Client::handleLimitMode(const std::string& mode, Channel *chan, const std::string& limit)
+{
+	// validate limit
+	if (!isValidLimit(limit))
+	{
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, chan->getName(), "Invalid limit"));
+		return ;
+	}
+	if (mode == "+l")
+	{
+		std::stringstream ss(limit);
+		size_t ulimit;
+		ss >> ulimit;
+		chan->setUserLimit(ulimit);
+		chan->brodcastResponse(Response::OKmsgToChannel(this->_nickname, this->_username, "MODE", chan->getName(), "Limit set to " + limit));
+	}
+	if (mode == "-l")
+	{
+		if (chan->getUserLimit() == MAX_CHAN_LIMIT)
+		{
+			this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, chan->getName(), "Channel does not have a limit"));
+			return ;
+		}
+		chan->setUserLimit(MAX_CHAN_LIMIT);
+		chan->brodcastResponse(Response::OKmsgToChannel(this->_nickname, this->_username, "MODE", chan->getName(), "Limit unset"));
+	}
+}
+
+void	Client::setMode(const std::string& mode, const std::string& channel, const std::string& arg)
+{
+	Channel *chan = this->_server->getChannel(channel);
+
+	std::cout << "mode: " << mode << " channel: " << channel << " arg: " << arg << std::endl;
+	if (channel == "" || channel[0] != '#')
+		return ;
+	if (chan == NULL || !chan->isClient(this->_fd))
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "MODE", "You are not in the channel"));
+	else if (!chan->isOperator(this->_fd))
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channel, "You are not an operator"));
+	else if (mode == "+i" || mode == "-i")
+		this->handleInviteMode(mode, chan);
+	else if (mode == "+t" || mode == "-t")
+		this->handleTopicMode(mode, chan);
+	else if (mode == "+k" || mode == "-k")
+		this->handlePasswordMode(mode, chan, arg);
+	else if (mode == "+o" || mode == "-o")
+		this->handleOperatorMode(mode, chan, arg);
+	else if (mode == "+l" || mode == "-l")
+		this->handleLimitMode(mode, chan, arg);
+	else
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "MODE", "Invalid mode"));
+}

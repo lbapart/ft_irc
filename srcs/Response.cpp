@@ -113,12 +113,18 @@ const std::string	Response::ERRmsgToChannel(const std::string& nickname, const s
 
 const std::string	Response::ERRmsgToUser(const std::string& nickname, const std::string& command, const std::string& message)
 {
-	std::string response = ":" + std::string(SERVER_NAME) + " 403 " + nickname + " :" + command + " :" + message + "\r\n";
+	std::string response = ":" + std::string(SERVER_NAME) + " 400 " + nickname + " :" + command + " :" + message + "\r\n";
 	return response;
 }
 
 const std::string	Response::OKquitSuccess(const std::string& nickname, const std::string& username, const std::string& reason)
 {
 	std::string response = ":" + nickname + "!" + username + "@localhost QUIT :" + reason + "\r\n";
+	return response;
+}
+
+const std::string	Response::OKmsgToChannel(const std::string& nickname, const std::string& username, const std::string& command, const std::string& channel, const std::string& message)
+{
+	std::string response = ":" + nickname + "!" + username + "@localhost " + command + " " + channel + " :" + message + "\r\n";
 	return response;
 }
