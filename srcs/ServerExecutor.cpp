@@ -21,6 +21,44 @@ static std::vector<std::string>	parseLines( const std::string &str, std::string 
 	return (result);
 }
 
+static void	validateNbrArgs( const std::string &line, const int &nbrArgs, bool isVarArgs = false ) {
+	std::istringstream	iss(line);
+	std::string			token;
+	int					nbr = 0;
+
+	while (std::getline(iss, token, ' '))
+		nbr++;
+	if (isVarArgs)
+	{
+		if (nbr < nbrArgs)
+			throw std::runtime_error("Wrong number of arguments");
+	}
+	else
+	{
+		if (nbr != nbrArgs)
+			throw std::runtime_error("Wrong number of arguments");
+	}
+}
+
+static std::string	getArgByNbr( const std::string &line, const int &nbr ) {
+	std::istringstream	iss(line);
+	std::string			token;
+	int					nbrArgs = 0;
+
+	while (std::getline(iss, token, ' ')) {
+		if (nbrArgs == nbr)
+			return (token);
+		nbrArgs++;
+	}
+	throw std::runtime_error("Wrong pattern");
+}
+
+static std::string	getOptionalArg( const std::string &line ) {
+	if (line.find(":") != std::string::npos)
+		return (line.substr(line.find(":") + 1));
+	return ("");
+}
+
 static void	executeCommand( const int &fd, const std::string &line, Server *server ) {
 	int				index = 0;
 	std::string		commands[12] = {
@@ -46,99 +84,64 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 	Client&	client = server->getClient(fd);
 	switch (index) {
 		case (0) :
-			client.setPassword(line.substr(5));
+			validateNbrArgs(line, 2);
+			client.setPassword(getArgByNbr(line, 1));
 			break;
 		case (1) : // NICK
-			client.setNickname(line.substr(5));
+			validateNbrArgs(line, 2);
+			client.setNickname(getArgByNbr(line, 1));
 			break;
 		case (2) : // Ping
+			validateNbrArgs(line, 2);
 			client.pong();
 			break;
 		case (3) : // USER
-			{
-				std::istringstream iss(line);
-				std::string token;
-				std::getline(iss, token, ' ');
-				std::getline(iss, token, ' ');
-				client.setUsername(token);
-			}
+			validateNbrArgs(line, 2, true);
+			client.setUsername(getArgByNbr(line, 1));
 			break;
 		case (4) : // TOPIC
-			{
-				std::istringstream iss(line);
-				std::string channelName, topic;
-				std::getline(iss, channelName, ' ');
-				std::getline(iss, channelName, ' ');
-				std::getline(iss, topic, ' ');
-				topic.assign(topic.begin() + 1, topic.end());
-				client.setTopic(channelName, topic);
-			}
+			validateNbrArgs(line, 3, true);
+			client.setTopic(getArgByNbr(line, 1), getOptionalArg(line));
 			break;
 		case (5) : // PRIVMSG
-			{
-				std::istringstream iss(line);
-				std::string username, message;
-				std::getline(iss, username, ' ');
-				std::getline(iss, username, ' ');
-				message = line.substr(line.find(":") + 1);
-				client.sendPrvMsg(username, message);
-			}
+			validateNbrArgs(line, 3, true);
+			client.sendPrvMsg(getArgByNbr(line, 1), getOptionalArg(line));
 			break;
 		case (6) : // JOIN
-			{
-				std::istringstream iss(line);
-				std::string channelName, password;
-				std::getline(iss, channelName, ' ');
-				std::getline(iss, channelName, ' ');
-				std::getline(iss, password, ' ');
-				client.joinChannel(channelName, password);
+			try {
+				validateNbrArgs(line, 2); // if no password is specified
+				client.joinChannel(getArgByNbr(line, 1), "");
+			} catch ( ... ) {
+				validateNbrArgs(line, 3);
+				client.joinChannel(getArgByNbr(line, 1), getArgByNbr(line, 2));
 			}
 			break;
 		case (7) : // KICK
-			{
-				std::istringstream iss(line);
-				std::string channelName, username, reason;
-				std::getline(iss, channelName, ' ');
-				std::getline(iss, channelName, ' ');
-				std::getline(iss, username, ' ');
-				reason = line.substr(line.find(":") + 1);
-				client.kickUser(channelName, username, reason);
-			}
+			validateNbrArgs(line, 4, true);
+			client.kickUser(getArgByNbr(line, 1), getArgByNbr(line, 2), getOptionalArg(line));
 			break;
 		case (8) : // QUIT
-			{
-				std::string reason = line.substr(line.find(":") + 1);
-				client.quit(reason);
-			}
+			validateNbrArgs(line, 2, true);
+			client.quit(getOptionalArg(line));
 			break;
 		case (9) : // INVITE
-			{
-				std::istringstream iss(line);
-				std::string nickname, channelName;
-				std::getline(iss, nickname, ' ');
-				std::getline(iss, nickname, ' ');
-				std::getline(iss, channelName, ' ');
-				client.inviteUser(nickname, channelName);
-			}
+			validateNbrArgs(line, 3);
+			client.inviteUser(getArgByNbr(line, 1), getArgByNbr(line, 2));
 			break;
 		case (10):   // LEAVE
-			{
-				std::istringstream iss(line);
-				std::string channelName;
-				std::getline(iss, channelName, ' ');
-				std::getline(iss, channelName, ' ');
-				client.leaveChannel(channelName);
-			}
+			validateNbrArgs(line, 2, true);
+			client.leaveChannel(getArgByNbr(line, 1));
 			break;
 		case (11):   // MODE
 			{
+				// validateNbrArgs(line, 4); to be implemented:)
 				std::istringstream iss(line);
 				std::string channelName, mode, arg;
 				std::getline(iss, channelName, ' ');
 				std::getline(iss, mode, ' ');
 				std::getline(iss, channelName, ' ');
 				std::getline(iss, arg, ' ');
-				client.setMode(channelName, mode, arg);
+				client.setMode(channelName, mode, arg); // to do later
 			}
 			break;
 		default:
@@ -155,7 +158,11 @@ void	Server::executeCommands( const int &fd, const std::string &line ) {
 		cmds = parseLines(line, "\n");
 
 	for (std::vector<std::string>::iterator it = cmds.begin(); it != cmds.end(); it++) {
-		executeCommand(fd, *it, this);
+		try {
+			executeCommand(fd, *it, this);
+		} catch ( const std::exception & ) {
+			std::cerr << "[Unkown pattern]: " << *it << std::endl;
+		}
 	}
 
 }
