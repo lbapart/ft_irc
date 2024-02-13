@@ -16,7 +16,6 @@ int	Server::getClientMessage(int fd, std::string &message)
 	else
 	{
 		message = buffer;
-		std::cout << "RECV = " << '\'' <<  message << '\'' << std::endl;
 		return (SUCCESS);
 	}
 }
@@ -27,7 +26,7 @@ void		Server::flushResponse(int fd)
 		return ;
 
 	int bytesSent = 0;
-	std::cout << "\nSending: " << this->getClient(fd).getOutputBuffer() << std::endl;
+	std::cout << "[Sending]: " << this->getClient(fd).getOutputBuffer() << std::endl;
 	std::string response = this->getClient(fd).getOutputBuffer();
 	this->getClient(fd).setOutputBuffer("");
 	while (bytesSent < (int)response.size())

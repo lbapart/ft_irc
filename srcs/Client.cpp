@@ -11,6 +11,7 @@ Client::Client(int fd, Server *serv)
 	this->_isNicknameSet = false;
 	this->_server = serv;
 	this->_outputBuffer = "";
+	this->_inputBuffer = "";
 }
 
 Client::~Client() {}
