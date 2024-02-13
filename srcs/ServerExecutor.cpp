@@ -1,17 +1,23 @@
 #include "General.hpp"
 
-static std::vector<std::string>	parseLines( const std::string &str ) {
+static std::vector<std::string>	parseLines( const std::string &str, std::string sep ) {
 	std::vector<std::string>	result;
+	std::string					line;
 	size_t						pos = 0;
 	size_t						prev = 0;
 
 	if (str.empty())
-		throw std::invalid_argument("Empty line");
+		throw int(42);
 
-	while ((pos = str.find("\r\n", prev)) != std::string::npos) {
-		result.push_back(str.substr(prev, pos - prev));
-		prev = pos + 2;
+	while ((pos = str.find(sep, prev)) != std::string::npos) {
+		line = str.substr(prev, pos - prev);
+		if (!line.empty())
+			result.push_back(line);
+		prev = pos + sep.length();
 	}
+	line = str.substr(prev);
+	if (!line.empty())
+		result.push_back(line);
 	return (result);
 }
 
@@ -34,7 +40,7 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 
 
 	for (index = 0; index < 11; index++)
-		if (line.find(commands[index]) != line.npos)
+		if (line.find(commands[index]) == 0)
 			break;
 
 	Client&	client = server->getClient(fd);
@@ -141,7 +147,12 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 }
 
 void	Server::executeCommands( const int &fd, const std::string &line ) {
-	std::vector<std::string> cmds = parseLines(line);
+	std::vector<std::string> cmds;
+
+	if (line.find("\r\n") != line.npos)
+		cmds = parseLines(line, "\r\n");
+	else
+		cmds = parseLines(line, "\n");
 
 	for (std::vector<std::string>::iterator it = cmds.begin(); it != cmds.end(); it++) {
 		executeCommand(fd, *it, this);

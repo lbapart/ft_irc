@@ -66,7 +66,7 @@ int	Server::pollinEvent(const int fd, std::vector<pollfd> &fds)
 			return (ERROR);
 		Client &client = this->getClient(fd);
 		client.setInputBuffer(client.getInputBuffer() + message);
-		if (client.getInputBuffer().find("\r\n") != std::string::npos)
+		if (client.getInputBuffer().find("\n") != std::string::npos)
 		{
 			std::cout << "[Received]: " << client.getInputBuffer() << std::endl;
 			message = client.getInputBuffer();

@@ -19,7 +19,7 @@ const std::string	Response::OKconnectionSuccess(const std::string& nickname)
 
 const std::string	Response::ERRconnectionInvalidPassword(const std::string& nickname)
 {
-	std::string response = ":" + std::string(SERVER_NAME) + " 464 " + nickname + " :Invalid password toscho\r\n";
+	std::string response = ":" + std::string(SERVER_NAME) + " 464 " + nickname + " :Invalid password\r\n";
 	return response;
 }
 
