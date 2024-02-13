@@ -9,6 +9,7 @@
 
 #include <string>
 #include <csignal>
+#include <unistd.h>
 
 #include "Server.hpp"
 #include "Client.hpp"
