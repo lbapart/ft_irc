@@ -71,7 +71,7 @@ static bool	authRequired(int index)
 
 static void	executeCommand( const int &fd, const std::string &line, Server *server ) {
 	int				index = 0;
-	std::string		commands[13] = {
+	std::string		commands[14] = {
 		"PASS",
     	"NICK",
     	"PING",
@@ -84,11 +84,12 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
     	"INVITE",
     	"PART",
 		"MODE",
-		"CAP"
+		"CAP",
+		"WHOIS"
 	};
 
 
-	for (index = 0; index < 13; index++)
+	for (index = 0; index < 14; index++)
 		if (line.find(commands[index]) == 0)
 			break;
 
@@ -137,6 +138,8 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 			client.setMode(getArgByNbr(line, 2), getArgByNbr(line, 1), getArgByNbr(line, 3));
 			break;
 		case (12):   // CAP
+			break;
+		case (13):  //WHOIS
 			break;
 		default:
 			client.handleUnknownCommand(getArgByNbr(line, 0));

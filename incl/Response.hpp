@@ -11,7 +11,7 @@ class Response
 		~Response();
 		// Connection
 		// Successfull connection, takes nickname as argument (const std::string& nickname)
-		static const std::string	OKconnectionSuccess(const std::string& nickname);
+		static const std::string	OKconnectionSuccess(const std::string& nickname, const std::string& username);
 		// Failed connection, invalid password, takes nickname as argument (const std::string& nickname)
 		static const std::string	ERRconnectionInvalidPassword(const std::string& nickname);
 
@@ -37,7 +37,7 @@ class Response
 		// Successful message, takes nickname, channel and message as arguments (const std::string& nickname, const std::string& message)
 		static const std::string	OKmessageSuccess(const std::string& nickname, const std::string& username, const std::string& channel, const std::string& message);
 		// Successful private message, takes nicknames (sender, receiver) and message as arguments (const std::string& sender, const std::string& receiver  ,const std::string& message)
-		static const std::string	OKprivateMessageSuccess(const std::string& sender, const std::string& receiver, const std::string& message);
+		static const std::string	OKprivateMessageSuccess(const std::string& sender, const std::string& senderUsername, const std::string& receiver, const std::string& message);
 
 		// Invite
 		// Successful invite, takes nickname and channel as arguments (const std::string& nickname, const std::string& channel)

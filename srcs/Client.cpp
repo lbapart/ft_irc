@@ -124,10 +124,12 @@ void		Client::checkAndSetAuthentificated()
 {
 	if (!(this->_isPasswordSet && this->_isUsernameSet && this->_isNicknameSet))
 		return ;
+	if (this->_isAuthentificated)
+		return ;
 	if (this->_password == this->_server->getPassword())
 	{
 		this->_isAuthentificated = true;
-		this->_server->prepareResponse(this->_fd, Response::OKconnectionSuccess(this->_nickname));
+		this->_server->prepareResponse(this->_fd, Response::OKconnectionSuccess(this->_nickname, this->_username));
 	}
 	else
 	{
@@ -288,7 +290,7 @@ void	Client::sendPrvMsg(const std::string& nickname, const std::string& message)
 		this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "User does not exist"));
 		return ;
 	}
-	this->_server->prepareResponse(this->_server->getClientIdByNickname(nickname), Response::OKprivateMessageSuccess(this->_nickname, nickname, message));
+	this->_server->prepareResponse(this->_server->getClientIdByNickname(nickname), Response::OKprivateMessageSuccess(this->_nickname, this->_username, nickname, message));
 }
 
 void	Client::kickUser(const std::string& channelName, const std::string& nickname, const std::string& reason)
