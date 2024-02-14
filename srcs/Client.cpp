@@ -220,7 +220,7 @@ void	Client::setTopic(const std::string& channelName, const std::string& topic) 
 	if (channel == NULL)
 	{
 		this->_server->prepareResponse(this->_fd, Response::ERRsetChannelTopicFailed(this->_nickname, channelName));
-		return ; // TODo: maybe we need to send a different response
+		return ;
 	}
 	if (!channel->isClient(this->_fd))
 	{
@@ -238,15 +238,17 @@ void	Client::setTopic(const std::string& channelName, const std::string& topic) 
 
 void	Client::sendPrvMsg(const std::string& nickname, const std::string& message)
 {
-	if (nickname[0] != '#')
+	if (nickname == "")
 	{
-		bool	client = this->_server->existByNickname(nickname);
-		if (client == false)
-			this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "User does not exist"));
-		else
-			this->_server->prepareResponse(this->_server->getClientIdByNickname(nickname), Response::OKprivateMessageSuccess(this->_nickname, nickname, message));
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "No recipient given"));
+		return ;
 	}
-	else
+	if (nickname == this->_nickname)
+	{
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "Cannot send message to yourself"));
+		return ;
+	}
+	if (nickname[0] == '#')
 	{
 		Channel *channel = this->_server->getChannel(nickname);
 
@@ -264,7 +266,22 @@ void	Client::sendPrvMsg(const std::string& nickname, const std::string& message)
 		{
 			this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "Channel does not exist"));
 		}
+		return ;
 	}
+
+	int fd = this->_server->getClientIdByNickname(nickname);
+	if (fd == -1)
+	{
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "User does not exist"));
+		return ;
+	}
+	Client& client = this->_server->getClient(fd);
+	if (!client.isAuthentificated())
+	{
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "User does not exist"));
+		return ;
+	}
+	this->_server->prepareResponse(this->_server->getClientIdByNickname(nickname), Response::OKprivateMessageSuccess(this->_nickname, nickname, message));
 }
 
 void	Client::kickUser(const std::string& channelName, const std::string& nickname, const std::string& reason)
@@ -318,6 +335,12 @@ void	Client::inviteUser(const std::string& nickname, const std::string& channelN
 	}
 	int fd = this->_server->getClientIdByNickname(nickname);
 	if (fd == -1)
+	{
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "User does not exist"));
+		return ;
+	}
+	Client& client = this->_server->getClient(fd);
+	if (!client.isAuthentificated())
 	{
 		this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "User does not exist"));
 		return ;
