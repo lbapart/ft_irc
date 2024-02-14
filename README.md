@@ -12,12 +12,12 @@ Starting the server :
 | Messaging actions | Execution |
 |----------|----------|
 | To send a private message : 			   | /msg <username> <message>	|
-| To switch between to a private message channel : | /query <username>  	|
+| To switch between/to a private message channel : | /query <username>  	|
 | To leave the private message channel :	   | /query 			|
 
 | Channel actions | Execution |
 |----------|----------|
-|To join/creating a channel : | /join <channel name> |
+|To join/create a channel : | /join <channel name> |
 |To leave the channel : | /leave |
 |Kick (operator privilage) : | /kick <username> |
 |Invite a user to the channel : | /invite <username> |
@@ -37,8 +37,8 @@ Channel rules:
 5. 	If the client limit set is to a lower limit then the current 
 	amount of joined Clients, nobody will be kicked but if someone leaves,
 	they cant connect back, same applies to new join tries
+5.	Operator only commands : MODE & KICK
 	
-
 
 IRC can be tested with nc(netcat) as well.
 
@@ -46,7 +46,7 @@ Linux instalation :
 `sudo apt-get install netcat`
 
 NC usage
-Connecting with NC (Steps 2-4 need no order ) :
+Connecting with NC (Steps 2-4 need no order):
 | Step | Execution |
 |----------|----------|
 | 1.	| nc   `<ip adress> <port>` |
