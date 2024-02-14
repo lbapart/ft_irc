@@ -50,6 +50,11 @@ std::string Client::getOutputBuffer() const
 	return this->_outputBuffer;
 }
 
+bool Client::isAuthentificated() const
+{
+	return this->_isAuthentificated;
+}
+
 void 		Client::setUsername(std::string username)
 {
 	// if username has a non valid character, replace it with '_'
@@ -496,4 +501,9 @@ void	Client::setMode(const std::string& mode, const std::string& channel, const 
 void	Client::handleUnknownCommand(const std::string& command)
 {
 	this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, command, "Unknown command"));
+}
+
+void	Client::handleNotAuthUser()
+{
+	this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "", "You are not authentificated"));
 }

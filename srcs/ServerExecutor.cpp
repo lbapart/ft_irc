@@ -59,6 +59,16 @@ static std::string	getOptionalArg( const std::string &line ) {
 	return ("");
 }
 
+static bool	authRequired(int index)
+{
+	// PASS, NICK, USER, CAP, QUIT
+	if (index == 0 || index == 1 || index == 3 || index == 12 || index == 8)
+	{
+		return (false);
+	}
+	return (true);
+}
+
 static void	executeCommand( const int &fd, const std::string &line, Server *server ) {
 	int				index = 0;
 	std::string		commands[13] = {
@@ -83,6 +93,11 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 			break;
 
 	Client&	client = server->getClient(fd);
+	if (authRequired(index) && !client.isAuthentificated())
+	{
+		client.handleNotAuthUser();
+		return ;
+	}
 	std::cout << "index: " << index << std::endl;
 	switch (index) {
 		case (0) :
