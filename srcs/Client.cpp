@@ -1,4 +1,5 @@
 #include "General.hpp"
+#include <cctype>
 
 Client::Client() {}
 
@@ -59,9 +60,7 @@ void 		Client::setUsername(std::string username)
 {
 	// if username has a non valid character, replace it with '_'
 	// valid characters are: [a-zA-Z0-9_]
-	for (size_t i = 0; i < username.size(); ++i)
-		if (!(std::isalnum(username[i]) || username[i] == '_'))
-			username[i] = '_';
+	username = this->_server->validateInput(username);
 
 	this->_username = this->_server->getAvailableUsername(username);
 	this->_isUsernameSet = true;
@@ -72,9 +71,8 @@ void Client::setNickname(std::string nickname)
 {
 	// if username has a non valid character, replace it with '_'
 	// valid characters are: [a-zA-Z0-9_]
-	for (size_t i = 0; i < nickname.size(); ++i)
-		if (!(std::isalnum(nickname[i]) || nickname[i] == '_'))
-			nickname[i] = '_';
+	nickname = this->_server->validateInput(nickname);
+
 	// if nickname not set, set it
 	if (!this->_isNicknameSet)
 	{
@@ -147,12 +145,21 @@ void		Client::pong( void )
 
 void		Client::joinChannel(const std::string& channelName, const std::string& password)
 {
-	// // if username has a non valid character, replace it with '_'
-	// // valid characters are: [a-zA-Z0-9_]
-	// for (size_t i = 0; i < nickname.size(); ++i)
-	// 	if (!(std::isalnum(nickname[i]) || nickname[i] == '_')) // TODO: maybe we need to add '-' to the valid characters -------------------------------------
-	// 		nickname[i] = '_';
+	// if username has a non valid character, replace it with '_'
+	// valid characters are: [a-zA-Z0-9_], the rest is replaced with '_'
+	for (size_t i = 0; i < channelName.size(); i++)
+	{
+		if (i == 0)
+			continue ;
+		if (!(std::isalnum(channelName[i]) || channelName[i] == '_'))
+		{
+			this->_server->prepareResponse(this->_fd, Response::ERRjoinFailed(this->_nickname, channelName, 403));
+			return ;
+		}
+	}
 
+	// std::string	channelName = this->_server->validateInput(channelName);
+	// channelName[0] = '#';
 	// check if user is already in this channel
 	if (this->_channels.size() > 0)
 	{

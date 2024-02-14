@@ -36,6 +36,13 @@ void	Server::run()
 
 		this->_fds.insert(this->_fds.end(), temp.begin(), temp.end());
 	}
+	for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+	{
+		// send OK quit to everuone
+		Client	&client = it->second;
+		this->prepareResponse(it->first, Response::OKquitSuccess(client.getNickname(), client.getUsername(), "Server closed"));
+		this->flushResponse(it->first);
+	}
 }
 
 int	Server::pollinEvent(const int fd, std::vector<pollfd> &fds)

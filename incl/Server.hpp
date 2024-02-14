@@ -54,6 +54,7 @@ class Server
 		void									deleteClient(const int fd);
 		bool									existByFd(const int fd);
 		bool									existByNickname(const std::string& nickname);
+		std::string								validateInput(const std::string& input);
 		std::string								getAvailableUsername(const std::string& username);
 		std::string								getAvailableNickname(const std::string& nickname);
 
