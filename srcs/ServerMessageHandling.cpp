@@ -16,6 +16,7 @@ int	Server::getClientMessage(int fd, std::string &message)
 	else
 	{
 		message = buffer;
+		std::cout << "[Message received]: " << message << std::endl;
 		return (SUCCESS);
 	}
 }

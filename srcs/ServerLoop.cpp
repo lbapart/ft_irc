@@ -70,7 +70,7 @@ int	Server::pollinEvent(const int fd, std::vector<pollfd> &fds)
 		client.setInputBuffer(client.getInputBuffer() + message);
 		if (client.getInputBuffer().find("\n") != std::string::npos)
 		{
-			std::cout << "[Received]: " << client.getInputBuffer() << std::endl;
+			std::cout << "[Message to parse]: " << client.getInputBuffer() << std::endl;
 			message = client.getInputBuffer();
 			client.setInputBuffer("");
 			this->executeCommands(fd, message);
