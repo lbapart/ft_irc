@@ -61,7 +61,7 @@ static std::string	getOptionalArg( const std::string &line ) {
 
 static void	executeCommand( const int &fd, const std::string &line, Server *server ) {
 	int				index = 0;
-	std::string		commands[12] = {
+	std::string		commands[13] = {
 		"PASS",
     	"NICK",
     	"PING",
@@ -73,11 +73,12 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
     	"QUIT",
     	"INVITE",
     	"PART",
-		"MODE"
+		"MODE",
+		"CAP"
 	};
 
 
-	for (index = 0; index < 12; index++)
+	for (index = 0; index < 13; index++)
 		if (line.find(commands[index]) == 0)
 			break;
 
@@ -119,6 +120,8 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 			break;
 		case (11):   // MODE
 			client.setMode(getArgByNbr(line, 2), getArgByNbr(line, 1), getArgByNbr(line, 3));
+			break;
+		case (12):   // CAP
 			break;
 		default:
 			client.handleUnknownCommand(getArgByNbr(line, 0));
