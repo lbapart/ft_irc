@@ -1,4 +1,5 @@
 #include "General.hpp"
+#include <cctype>
 
 Client::Client() {}
 
@@ -50,13 +51,16 @@ std::string Client::getOutputBuffer() const
 	return this->_outputBuffer;
 }
 
+bool Client::isAuthentificated() const
+{
+	return this->_isAuthentificated;
+}
+
 void 		Client::setUsername(std::string username)
 {
 	// if username has a non valid character, replace it with '_'
 	// valid characters are: [a-zA-Z0-9_]
-	for (size_t i = 0; i < username.size(); ++i)
-		if (!(std::isalnum(username[i]) || username[i] == '_'))
-			username[i] = '_';
+	username = this->_server->validateInput(username);
 
 	this->_username = this->_server->getAvailableUsername(username);
 	this->_isUsernameSet = true;
@@ -67,9 +71,8 @@ void Client::setNickname(std::string nickname)
 {
 	// if username has a non valid character, replace it with '_'
 	// valid characters are: [a-zA-Z0-9_]
-	for (size_t i = 0; i < nickname.size(); ++i)
-		if (!(std::isalnum(nickname[i]) || nickname[i] == '_'))
-			nickname[i] = '_';
+	nickname = this->_server->validateInput(nickname);
+
 	// if nickname not set, set it
 	if (!this->_isNicknameSet)
 	{
@@ -121,10 +124,12 @@ void		Client::checkAndSetAuthentificated()
 {
 	if (!(this->_isPasswordSet && this->_isUsernameSet && this->_isNicknameSet))
 		return ;
+	if (this->_isAuthentificated)
+		return ;
 	if (this->_password == this->_server->getPassword())
 	{
 		this->_isAuthentificated = true;
-		this->_server->prepareResponse(this->_fd, Response::OKconnectionSuccess(this->_nickname));
+		this->_server->prepareResponse(this->_fd, Response::OKconnectionSuccess(this->_nickname, this->_username));
 	}
 	else
 	{
@@ -142,12 +147,21 @@ void		Client::pong( void )
 
 void		Client::joinChannel(const std::string& channelName, const std::string& password)
 {
-	// // if username has a non valid character, replace it with '_'
-	// // valid characters are: [a-zA-Z0-9_]
-	// for (size_t i = 0; i < nickname.size(); ++i)
-	// 	if (!(std::isalnum(nickname[i]) || nickname[i] == '_')) // TODO: maybe we need to add '-' to the valid characters -------------------------------------
-	// 		nickname[i] = '_';
+	// if username has a non valid character, replace it with '_'
+	// valid characters are: [a-zA-Z0-9_], the rest is replaced with '_'
+	for (size_t i = 0; i < channelName.size(); i++)
+	{
+		if (i == 0)
+			continue ;
+		if (!(std::isalnum(channelName[i]) || channelName[i] == '_'))
+		{
+			this->_server->prepareResponse(this->_fd, Response::ERRjoinFailed(this->_nickname, channelName, 403));
+			return ;
+		}
+	}
 
+	// std::string	channelName = this->_server->validateInput(channelName);
+	// channelName[0] = '#';
 	// check if user is already in this channel
 	if (this->_channels.size() > 0)
 	{
@@ -157,7 +171,7 @@ void		Client::joinChannel(const std::string& channelName, const std::string& pas
 			{
 				this->_channels.erase(it);
 				this->_channels.push_back(this->_server->getChannel(channelName));
-				return ; // TODO: maybe we need to send a response to the client
+				return ;
 			}
 		}
 	}
@@ -215,7 +229,7 @@ void	Client::setTopic(const std::string& channelName, const std::string& topic) 
 	if (channel == NULL)
 	{
 		this->_server->prepareResponse(this->_fd, Response::ERRsetChannelTopicFailed(this->_nickname, channelName));
-		return ; // TODo: maybe we need to send a different response
+		return ;
 	}
 	if (!channel->isClient(this->_fd))
 	{
@@ -233,15 +247,17 @@ void	Client::setTopic(const std::string& channelName, const std::string& topic) 
 
 void	Client::sendPrvMsg(const std::string& nickname, const std::string& message)
 {
-	if (nickname[0] != '#')
+	if (nickname == "")
 	{
-		bool	client = this->_server->existByNickname(nickname);
-		if (client == false)
-			this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "User does not exist"));
-		else
-			this->_server->prepareResponse(this->_server->getClientIdByNickname(nickname), Response::OKprivateMessageSuccess(this->_nickname, nickname, message));
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "No recipient given"));
+		return ;
 	}
-	else
+	if (nickname == this->_nickname)
+	{
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "Cannot send message to yourself"));
+		return ;
+	}
+	if (nickname[0] == '#')
 	{
 		Channel *channel = this->_server->getChannel(nickname);
 
@@ -259,7 +275,22 @@ void	Client::sendPrvMsg(const std::string& nickname, const std::string& message)
 		{
 			this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "Channel does not exist"));
 		}
+		return ;
 	}
+
+	int fd = this->_server->getClientIdByNickname(nickname);
+	if (fd == -1)
+	{
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "User does not exist"));
+		return ;
+	}
+	Client& client = this->_server->getClient(fd);
+	if (!client.isAuthentificated())
+	{
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "PRIVMSG", "User does not exist"));
+		return ;
+	}
+	this->_server->prepareResponse(this->_server->getClientIdByNickname(nickname), Response::OKprivateMessageSuccess(this->_nickname, this->_username, nickname, message));
 }
 
 void	Client::kickUser(const std::string& channelName, const std::string& nickname, const std::string& reason)
@@ -313,6 +344,12 @@ void	Client::inviteUser(const std::string& nickname, const std::string& channelN
 	}
 	int fd = this->_server->getClientIdByNickname(nickname);
 	if (fd == -1)
+	{
+		this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "User does not exist"));
+		return ;
+	}
+	Client& client = this->_server->getClient(fd);
+	if (!client.isAuthentificated())
 	{
 		this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, channelName, "User does not exist"));
 		return ;
@@ -441,24 +478,6 @@ void	Client::handleOperatorMode(const std::string& mode, Channel *chan, const st
 	}
 }
 
-static bool isValidLimit(const std::string& limit)
-{
-	if (limit.size() == 0)
-		return false;
-	for (size_t i = 0; i < limit.size(); ++i)
-	{
-		if (!std::isdigit(limit[i]))
-			return false;
-		if (i == 9 && i + 1 != limit.size())
-			return false;
-		if (i == 9 && i + 1 == limit.size() && limit > "4294967295")
-			return false;
-		if (i == 10)
-			return false;
-	}
-	return true;
-}
-
 void	Client::handleLimitMode(const std::string& mode, Channel *chan, const std::string& limit)
 {
 	// validate limit
@@ -491,7 +510,6 @@ void	Client::setMode(const std::string& mode, const std::string& channel, const 
 {
 	Channel *chan = this->_server->getChannel(channel);
 
-	std::cout << "mode: " << mode << " channel: " << channel << " arg: " << arg << std::endl;
 	if (channel == "" || channel[0] != '#')
 		return ;
 	if (chan == NULL || !chan->isClient(this->_fd))
@@ -510,4 +528,14 @@ void	Client::setMode(const std::string& mode, const std::string& channel, const 
 		this->handleLimitMode(mode, chan, arg);
 	else
 		this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "MODE", "Invalid mode"));
+}
+
+void	Client::handleUnknownCommand(const std::string& command)
+{
+	this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, command, "Unknown command"));
+}
+
+void	Client::handleNotAuthUser()
+{
+	this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "", "You are not authentificated"));
 }

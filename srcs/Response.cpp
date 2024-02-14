@@ -11,9 +11,9 @@ static std::string	to_string(int intValue)
     return ss.str();
 }
 
-const std::string	Response::OKconnectionSuccess(const std::string& nickname)
+const std::string	Response::OKconnectionSuccess(const std::string& nickname, const std::string& username)
 {
-	std::string response = ":" + std::string(SERVER_NAME) + " 001 " + nickname + " :Welcome to the Internet Relay Network " + nickname + "!" + SERVER_NAME + "@localhost\r\n";
+	std::string response = ":" + std::string(SERVER_NAME) + " 001 " + nickname + " :Welcome to the Internet Relay Network " + nickname + "!" + username + "@localhost\r\n";
 	return response;
 }
 
@@ -66,9 +66,9 @@ const std::string	Response::OKmessageSuccess(const std::string& nickname, const 
 }
 
 // не уверен, что это правильно
-const std::string	Response::OKprivateMessageSuccess(const std::string& sender, const std::string& receiver, const std::string& message)
+const std::string	Response::OKprivateMessageSuccess(const std::string& sender, const std::string& senderUsername, const std::string& receiver, const std::string& message)
 {
-	std::string response = ":" + sender + "!" + std::string(SERVER_NAME) + "@localhost PRIVMSG " + receiver + " :" + message + "\r\n";
+	std::string response = ":" + sender + "!" + senderUsername + "@localhost PRIVMSG " + receiver + " :" + message + "\r\n";
 	return response;
 }
 

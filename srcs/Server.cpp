@@ -1,4 +1,5 @@
 #include "General.hpp"
+#include <cctype>
 
 Server::Server(ushort port, const std::string& password)
 {
@@ -32,6 +33,7 @@ Server::~Server()
 		close(it->fd);
 	}
 	close(this->_socket);
+	std::cout << "🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡" << std::endl;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -121,6 +123,17 @@ bool					Server::existByFd(const int fd)
 {
 	return this->_clients.find(fd) != this->_clients.end();
 }
+
+std::string				Server::validateInput(const std::string& input)
+{
+	std::string	res = input;
+
+	for (std::string::iterator it = res.begin(); it != res.end(); it++)
+		if (!(std::isalnum(*it) || *it == '_'))
+			*it = '_';
+	return res;
+}
+
 
 std::string				Server::getAvailableUsername(const std::string& username)
 {

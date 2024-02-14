@@ -37,6 +37,7 @@ class Client
 		std::string		getPassword() const;
 		std::string		getInputBuffer() const;
 		std::string		getOutputBuffer() const;
+		bool			isAuthentificated() const;
 
 		void			setUsername(std::string username);
 		void			setNickname(std::string nickname);
@@ -59,7 +60,8 @@ class Client
 		void			handlePasswordMode(const std::string& mode, Channel *chan, const std::string& password);
 		void			handleOperatorMode(const std::string& mode, Channel *chan, const std::string& nickname);
 		void			handleLimitMode(const std::string& mode, Channel *chan, const std::string& limit);
-
+		void			handleUnknownCommand(const std::string& command);
+		void			handleNotAuthUser();
 
 
 		// int				changeChannelTopic(const std::string& topic);

@@ -10,12 +10,14 @@ int	Server::getClientMessage(int fd, std::string &message)
 	int bytesRead = recv(fd, buffer, 1024, 0);
 	if (bytesRead <= 0)
 	{
+		std::cout << "Client disconnected" << std::endl;
 		this->deleteClient(fd);
 		return (ERROR);
 	}
 	else
 	{
 		message = buffer;
+		std::cout << "[Message received]: " << message << std::endl;
 		return (SUCCESS);
 	}
 }

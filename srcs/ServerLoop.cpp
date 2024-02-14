@@ -15,10 +15,8 @@ void	Server::run()
 		std::vector<pollfd>	temp;
 
 		if (poll(this->_fds.data(), this->_fds.size(), -1) == -1) {
-			if (g_running == false)
-				break ;
-			std::cerr << "Poll error" << std::endl;
-			throw PollException();
+			if (this->_fds.size() != 1)
+				throw PollException();
 		}
 
 		std::vector<pollfd>::iterator it = this->_fds.begin();
@@ -26,7 +24,6 @@ void	Server::run()
 		{
 			if (it->revents & POLLIN)
 			{
-				//if (this->pollinEvent(it->fd, temp) == ERROR)
 				this->pollinEvent(it->fd, temp);
 				break ;
 			}
@@ -34,14 +31,17 @@ void	Server::run()
 			{
 				this->flushResponse(it->fd);
 			}
-			else if (it->revents & POLLHUP)
-			{
-				std::cout << "Connection closed" << std::endl;
-			}
 			++it;
 		}
 
 		this->_fds.insert(this->_fds.end(), temp.begin(), temp.end());
+	}
+	for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+	{
+		// send OK quit to everuone
+		Client	&client = it->second;
+		this->prepareResponse(it->first, Response::OKquitSuccess(client.getNickname(), client.getUsername(), "Server closed"));
+		this->flushResponse(it->first);
 	}
 }
 
@@ -70,7 +70,7 @@ int	Server::pollinEvent(const int fd, std::vector<pollfd> &fds)
 		client.setInputBuffer(client.getInputBuffer() + message);
 		if (client.getInputBuffer().find("\n") != std::string::npos)
 		{
-			std::cout << "[Received]: " << client.getInputBuffer() << std::endl;
+			std::cout << "[Message to parse]: " << client.getInputBuffer() << std::endl;
 			message = client.getInputBuffer();
 			client.setInputBuffer("");
 			this->executeCommands(fd, message);
