@@ -8,13 +8,15 @@ void	Server::run()
 		throw SocketBindException();
 	//TODO think about number of clients
 	//listen function limits the number of pending connections
-	if (listen(this->_socket, 10) == -1)
+	if (listen(this->_socket, 5000) == -1)
 		throw SocketListenException();
 	while (g_running)
 	{
 		std::vector<pollfd>	temp;
 
 		if (poll(this->_fds.data(), this->_fds.size(), -1) == -1) {
+			if (g_running == false)
+				break ;
 			std::cerr << "Poll error" << std::endl;
 			throw PollException();
 		}

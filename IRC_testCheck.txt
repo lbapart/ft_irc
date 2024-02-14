@@ -1,0 +1,58 @@
+Legend :
+passed ✅
+has to be fixed 🟧
+
+/connect 127.0.0.1 8080 abc user1
+
+testers used : 
+https://github.com/opsec-infosec/ft_irc-tester (did not crash even with 5000 clients) ✅
+
+Valgrind ✅
+
+I tried these tests : ✅
+
+- wlp0s20f3 my network interface name
+- to get your you need this command : ip link show
+
+1. Add a new queueing discipline (qdisc) to the network interface:
+	sudo tc qdisc add dev wlp0s20f3 root handle 1: htb default 12
+2. Create a new class with limited bandwidth (for example, 500kbps):
+	sudo tc class add dev wlp0s20f3 parent 1:1 classid 1:12 htb rate 500kbps ceil 500kbps
+3. Simulate high latency (for example, 200ms):
+	sudo tc qdisc add dev wlp0s20f3 parent 1:12 netem delay 200ms
+4. Simulate packet loss (for example, 10%):
+	sudo tc qdisc change dev wlp0s20f3 parent 1:12 netem loss 10%
+5. Remove the rules: 
+	sudo tc qdisc del dev wlp0s20f3 root
+
+Remember to replace wlp0s20f3 with your actual network interface name.
+
+when I set bandwith to 50kbps, network delay to 1200ms and packet loss to 90%
+i could not user internet, irc was still working tough ✅
+
+
+checks :
+1. one poll ✅
+2. correct use of fnctl ✅
+3. no errno ✅
+4. sent invalid commands with nc while other clients where sending message ✅
+5. kill nc, server is not stuck  ✅
+6. kill client, no server error  ✅
+7. Client can be authenticated with IRSSI and NC ✅
+8. IRSSI & NC clients can change username, nickname join a channel
+	and send differen PRIVMSG ✅
+9. check that regular user cant do operator commands ✅
+
+
+Dont understand this test cases : 
+Stop a client (^-Z) connected on a channel. Then flood the channel using 
+another client. The server should not hang. When the client is live again,
+all stored commands should be processed normally.
+
+
+POSSIBLE IMPROVEMENTS :
+1. 	if the channel operator leaves the channel/server, 
+	maybe assign client next in order as a new operator
+	otherwise channel stays with no operator
+	
+
