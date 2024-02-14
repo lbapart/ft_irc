@@ -62,6 +62,6 @@ Connecting with NC (Steps 2-4 need no order):
 | Set/remove channel password	     | MODE	#channelname +k/-k password   |
 | Set/remove channel limit	     | MODE	#channelname +l/-l limit      |
 | Add/remove channel operator	     | MODE	#channelname +o/-o nickname   |
-| Set/remove channel topic privilige | MODE	#channelname +t/-t	      |
+| Set/remove channel topic privilege | MODE	#channelname +t/-t	      |
 | Set/remove channel to invite only  | MODE	#channelname +i/-i	      |
 | Kick client from a channel	     | KICK	#channelname nickname :reason |
