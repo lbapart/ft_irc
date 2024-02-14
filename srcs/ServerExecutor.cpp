@@ -88,9 +88,9 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 		"WHOIS"
 	};
 
-
+	std::string command = getArgByNbr(line, 0);
 	for (index = 0; index < 14; index++)
-		if (line.find(commands[index]) == 0)
+		if (command == (commands[index]))
 			break;
 
 	Client&	client = server->getClient(fd);

@@ -171,7 +171,7 @@ void		Client::joinChannel(const std::string& channelName, const std::string& pas
 			{
 				this->_channels.erase(it);
 				this->_channels.push_back(this->_server->getChannel(channelName));
-				return ; // TODO: maybe we need to send a response to the client
+				return ;
 			}
 		}
 	}
