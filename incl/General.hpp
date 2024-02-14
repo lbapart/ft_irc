@@ -22,4 +22,6 @@ class Client;
 
 extern bool g_running;
 
+bool    isValidLimit(const std::string& limit);
+
 #endif

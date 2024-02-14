@@ -441,24 +441,6 @@ void	Client::handleOperatorMode(const std::string& mode, Channel *chan, const st
 	}
 }
 
-static bool isValidLimit(const std::string& limit)
-{
-	if (limit.size() == 0)
-		return false;
-	for (size_t i = 0; i < limit.size(); ++i)
-	{
-		if (!std::isdigit(limit[i]))
-			return false;
-		if (i == 9 && i + 1 != limit.size())
-			return false;
-		if (i == 9 && i + 1 == limit.size() && limit > "4294967295")
-			return false;
-		if (i == 10)
-			return false;
-	}
-	return true;
-}
-
 void	Client::handleLimitMode(const std::string& mode, Channel *chan, const std::string& limit)
 {
 	// validate limit
@@ -491,7 +473,6 @@ void	Client::setMode(const std::string& mode, const std::string& channel, const 
 {
 	Channel *chan = this->_server->getChannel(channel);
 
-	std::cout << "mode: " << mode << " channel: " << channel << " arg: " << arg << std::endl;
 	if (channel == "" || channel[0] != '#')
 		return ;
 	if (chan == NULL || !chan->isClient(this->_fd))
@@ -510,4 +491,9 @@ void	Client::setMode(const std::string& mode, const std::string& channel, const 
 		this->handleLimitMode(mode, chan, arg);
 	else
 		this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, "MODE", "Invalid mode"));
+}
+
+void	Client::handleUnknownCommand(const std::string& command)
+{
+	this->_server->prepareResponse(this->_fd, Response::ERRmsgToUser(this->_nickname, command, "Unknown command"));
 }

@@ -59,7 +59,7 @@ class Client
 		void			handlePasswordMode(const std::string& mode, Channel *chan, const std::string& password);
 		void			handleOperatorMode(const std::string& mode, Channel *chan, const std::string& nickname);
 		void			handleLimitMode(const std::string& mode, Channel *chan, const std::string& limit);
-
+		void			handleUnknownCommand(const std::string& command);
 
 
 		// int				changeChannelTopic(const std::string& topic);
