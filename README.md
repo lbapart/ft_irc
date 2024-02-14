@@ -2,66 +2,66 @@
 
 Starting the server :
 
-./ircserv <port> <password>
+`./ircserv <port> <password>`
 
-Private messages :
-1.	To send a private message :					                      /msg <username> <message>
-2.	To switch between to a private message channel :		      /query <username>
-3.	To leave the private message channel :				            /query
+| Client actions | Execution |
+|----------|----------|
+|Change username : | /user <new username> |
+|Change nickname : | /nick <new nickname> |
 
-Channels:
-1.	To join/creating a channel:					                      /join <channel name>
-2.	If the channel does not exist, the one joining it first, 
-	Creates the channel and becomes the channel operator
-3.	Leaving the channel :						                          /leave
+| Messaging actions | Execution |
+|----------|----------|
+| To send a private message : 			   | /msg <username> <message>	|
+| To switch between to a private message channel : | /query <username>  	|
+| To leave the private message channel :	   | /query 			|
+
+| Channel actions | Execution |
+|----------|----------|
+|To join/creating a channel : | /join <channel name> |
+|To leave the channel : | /leave |
+|Kick (operator privilage) : | /kick <username> |
+|Invite a user to the channel : | /invite <username> |
+|Change channel topic : | /topic <topic name> |
+|Set/remove the invite-only channel : | /mode +i/-i |
+|Set/remove the restriction of the TOPIC to operator : | /mode +t/-t |
+|Set/remove the channel key (password) : | /mode +k/-k <password> |
+|Set/remove the user limit to channel : | /mode +l/-l <limit> |
 
 Channel rules:
-1.	If the channel has no password set, anyone can join
-2.	If the password is set, a client connecting to the channel has to specify it
-3.	If the channel is set to invite-only, password is not necessary but
+1.	If the channel does not exist, the one joining it first, 
+	Creates the channel and becomes the channel operator
+2.	If the channel has no password set, anyone can join
+3.	If the password is set, a client connecting to the channel has to specify it
+4.	If the channel is set to invite-only, password is not necessary but
 	the client has to be invited by someone inside the channel
-4. 	If the client limit set is to a lower limit then the current 
+5. 	If the client limit set is to a lower limit then the current 
 	amount of joined Clients, nobody will be kicked but if someone leaves,
 	they cant connect back, same applies to new join tries
-
-Modes:
-1.	Set/remove Invite-only channel : 				                /mode +i/-i
-2.	Set/remove the restrictions of the TOPIC to operator		/mode +t/-t
-3.	Set/remove the channel key (password)				            /mode +k/-k <password>
-4.	Set/remove the user limit to channel				            /mode +l/-l <limit>
 	
-Client changes:
-1. 	Change username							                            /user <new username>
-2.	Change nickname							                            /nick <new nickname>
 
-Kick (operator privilage):
-1.	Kick a client user from channel 				                /kick <username>
 
-Invite :
-1.	Invite a user to the channel 					                  /invite <username>
+IRC can be tested with nc(netcat) as well.
 
-Topic:
-1.	Change channel topic						                        /topic <topic name>
-2.	Topic, if the operator wishes so, 
-	can have a changed privilage to the operator only
+Linux instalation : 
+`sudo apt-get install netcat`
 
-IRC can be tested with nc as well. For that you need netcat. 
-Linux instalation : sudo apt-get install netcat 
 NC usage
-{
-Connecting with NC :
-1. nc 127.0.0.1 8080
-2. NICK <define nickname>
-3. USER <define username>
-4. PASS <write password>
+Connecting with NC (Steps 2-4 need no order ) :
+| Step | Execution |
+|----------|----------|
+| 1.	| nc   `<ip adress> <port>` |
+| 2.	| NICK `<nickname>`	    |
+| 3.	| USER `<username>`	    |
+| 4.	| PASS `<password>` 	    |
 
-JOIN <#channelname>
-PRIVMSG username :message		          // Direct private message
-PRIVMSG #channelname :message 		    // Channel message
-MODE	#channelname +k/-k password	    // Set/remove password
-MODE	#channelname +l/-l limit	      // Set/remove limit
-MODE	#channelname +o/-o nickname	    // Add/remove operator
-MODE	#channelname +t/-t		          // Set/remove topic privilige
-MODE	#channelname +i/-i 		          // Set/remove invite only
-KICK	#channelname nickname :reason
-}
+| Action | Command |
+|----------|----------|
+| Join a channel		     | JOIN <#channelname>		      |
+| Direct private message	     | PRIVMSG username :message	      |
+| Channel message		     | PRIVMSG #channelname :message	      |
+| Set/remove channel password	     | MODE	#channelname +k/-k password   |
+| Set/remove channel limit	     | MODE	#channelname +l/-l limit      |
+| Add/remove channel operator	     | MODE	#channelname +o/-o nickname   |
+| Set/remove channel topic privilige | MODE	#channelname +t/-t	      |
+| Set/remove channel to invite only  | MODE	#channelname +i/-i	      |
+| Kick client from a channel	     | KICK	#channelname nickname :reason |
