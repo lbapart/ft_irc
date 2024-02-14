@@ -15,8 +15,8 @@ void	Server::run()
 		std::vector<pollfd>	temp;
 
 		if (poll(this->_fds.data(), this->_fds.size(), -1) == -1) {
-			std::cerr << "Poll error" << std::endl;
-			throw PollException();
+			if (this->_fds.size() != 1)
+				throw PollException();
 		}
 
 		std::vector<pollfd>::iterator it = this->_fds.begin();
@@ -24,17 +24,12 @@ void	Server::run()
 		{
 			if (it->revents & POLLIN)
 			{
-				//if (this->pollinEvent(it->fd, temp) == ERROR)
 				this->pollinEvent(it->fd, temp);
 				break ;
 			}
 			else if (it->revents & POLLOUT)
 			{
 				this->flushResponse(it->fd);
-			}
-			else if (it->revents & POLLHUP)
-			{
-				std::cout << "Connection closed" << std::endl;
 			}
 			++it;
 		}
