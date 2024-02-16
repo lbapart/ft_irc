@@ -57,6 +57,7 @@ Connecting with NC (Steps 2-4 need no order):
 | Action | Command |
 |----------|----------|
 | Join a channel		     | JOIN <#channelname>		      |
+| Leave a channel		     | PART <#channelname>		      |
 | Direct private message	     | PRIVMSG username :message	      |
 | Channel message		     | PRIVMSG #channelname :message	      |
 | Set/remove channel password	     | MODE	#channelname +k/-k password   |
