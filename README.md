@@ -37,7 +37,7 @@ Channel rules:
 5. 	If the client limit set is to a lower limit then the current 
 	amount of joined Clients, nobody will be kicked but if someone leaves,
 	they cant connect back, same applies to new join tries
-5.	Operator only commands : MODE & KICK
+6.	Operator only commands : MODE & KICK
 	
 
 IRC can be tested with nc(netcat) as well.
