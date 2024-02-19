@@ -23,6 +23,25 @@ static inline void	putIntro( void )
 	std::cout << "───────────────────────────────────────────────────────────────────────────────" << std::endl;
 }
 
+static bool	checkPort(const std::string& port)
+{
+	if (port.empty())
+		return false;
+	size_t len = port.length();
+	if (len > 1 && port[0] == '0')
+		return false;
+	if (len > 5)
+		return false;
+	if (len == 5 && port.compare("65535") > 0)
+		return false;
+	for (std::string::const_iterator it = port.begin(); it != port.end(); ++it)
+	{
+		if (!std::isdigit(*it))
+			return false;
+	}
+	return true;
+}
+
 int main(int argc, char **argv)
 {
 	if (argc != 3)
@@ -32,6 +51,8 @@ int main(int argc, char **argv)
 	}
 	try
 	{
+		if (!checkPort(std::string(argv[1])))
+			throw std::invalid_argument("Invalid port");
 		std::stringstream port(argv[1]);
 		ushort _port;
 		port >> _port;

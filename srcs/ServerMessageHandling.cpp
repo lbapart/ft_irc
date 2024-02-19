@@ -35,7 +35,7 @@ void		Server::flushResponse(int fd)
 	{
 		int sent = send(fd, response.c_str() + bytesSent, response.size() - bytesSent, 0);
 		if (sent == -1)
-			throw SendException(); //here
+			std::cout << "Can't send response to a client" << std::endl;
 		bytesSent += sent;
 	}
 
