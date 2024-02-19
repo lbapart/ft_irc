@@ -99,7 +99,6 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 		client.handleNotAuthUser();
 		return ;
 	}
-	std::cout << "index: " << index << std::endl;
 	switch (index) {
 		case (0) :
 			client.setPassword(getArgByNbr(line, 1));

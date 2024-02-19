@@ -215,7 +215,6 @@ void		Client::leaveChannel(const std::string& channelName)
 			this->_server->prepareResponse(this->_fd, Response::OKleaveSuccess(this->_nickname, this->_username, channelName));
 			std::string response = Response::OKmessageSuccess(this->_nickname, this->_username, (*it)->getName(), "has left the channel");
 			(*it)->brodcastResponse(response);
-			std::cout << '\'' << this->_nickname << '\'' << " has left the channel" << std::endl;
 			this->_channels.erase(it);
 			return ;
 		}
