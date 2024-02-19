@@ -8,9 +8,15 @@ MAKEFLAGS	= -j$(nproc)
 
 INCLUDES	= -I ./incl
 SRCS_DIR	= srcs
-#SRCS	= ${SRCS_DIR}/main.cpp
-
-SRCS		= $(wildcard $(SRCS_DIR)/*.cpp)
+SRCS	=	${SRCS_DIR}/main.cpp \
+			${SRCS_DIR}/Channel.cpp \
+			${SRCS_DIR}/Client.cpp \
+			${SRCS_DIR}/HelpingFunctions.cpp \
+			${SRCS_DIR}/Response.cpp \
+			${SRCS_DIR}/Server.cpp \
+			${SRCS_DIR}/ServerExecutor.cpp \
+			${SRCS_DIR}/ServerLoop.cpp \
+			${SRCS_DIR}/ServerMessageHandling.cpp \
 
 OBJS_DIR	= objs
 OBJS	= $(addprefix $(OBJS_DIR)/, $(SRCS:.cpp=.o))
