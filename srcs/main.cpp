@@ -53,6 +53,8 @@ int main(int argc, char **argv)
 	{
 		if (!checkPort(std::string(argv[1])))
 			throw std::invalid_argument("Invalid port");
+		if (std::string(argv[2]).empty())
+			throw std::invalid_argument("Invalid password");
 		std::stringstream port(argv[1]);
 		ushort _port;
 		port >> _port;

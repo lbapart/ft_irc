@@ -6,6 +6,8 @@
 # define ERR_CHANNELISFULL 471
 # define ERR_BADCHANNELKEY 475
 # define ERR_INVITEONLYCHAN 473
+# define MAX_CLIENTS 10
+# define QUIT 2
 
 #include <string>
 #include <csignal>

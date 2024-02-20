@@ -209,12 +209,15 @@ void		Client::leaveChannel(const std::string& channelName)
 		// if user is in this channel remove him from it
 		if ((*it)->getName() == channelName)
 		{
-			(*it)->removeClient(this->_fd);
-			(*it)->removeOperator(this->_fd);
-			(*it)->removeInvite(this->_fd);
 			this->_server->prepareResponse(this->_fd, Response::OKleaveSuccess(this->_nickname, this->_username, channelName));
 			std::string response = Response::OKmessageSuccess(this->_nickname, this->_username, (*it)->getName(), "has left the channel");
-			(*it)->brodcastResponse(response);
+			(*it)->removeInvite(this->_fd);
+			(*it)->removeOperator(this->_fd);
+			(*it)->removeClient(this->_fd);
+			if ((*it)->getNumberOfClients() == 0)
+				this->_server->removeChannel(channelName);
+			else
+				(*it)->brodcastResponse(response);
 			this->_channels.erase(it);
 			return ;
 		}
@@ -479,14 +482,15 @@ void	Client::handleOperatorMode(const std::string& mode, Channel *chan, const st
 
 void	Client::handleLimitMode(const std::string& mode, Channel *chan, const std::string& limit)
 {
-	// validate limit
-	if (!isValidLimit(limit))
-	{
-		this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, chan->getName(), "Invalid limit"));
-		return ;
-	}
+	
 	if (mode == "+l")
 	{
+		// validate limit
+		if (!isValidLimit(limit))
+		{
+			this->_server->prepareResponse(this->_fd, Response::ERRmsgToChannel(this->_nickname, chan->getName(), "Invalid limit"));
+			return ;
+		}
 		std::stringstream ss(limit);
 		size_t ulimit;
 		ss >> ulimit;

@@ -51,6 +51,7 @@ public:
 	int 						addInvite( const int &fd );
 	int 						removeInvite( const int &fd );
 	bool						isInvited( const int &fd ) const;
+	int							getNumberOfClients( void ) const;
 	void						postMessageInChannel( const std::string &message, const int& fd );
 	void						brodcastResponse( const std::string &response );
 };

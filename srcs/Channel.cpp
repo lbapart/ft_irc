@@ -180,3 +180,8 @@ void	Channel::brodcastResponse( const std::string &response )
 		this->_server->prepareResponse(*it, response);
 	}
 }
+
+int		Channel::getNumberOfClients( void ) const
+{
+	return (this->_clients.size());
+}

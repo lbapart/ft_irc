@@ -8,7 +8,7 @@ void	Server::run()
 		throw SocketBindException();
 	//TODO think about number of clients
 	//listen function limits the number of pending connections
-	if (listen(this->_socket, 5000) == -1)
+	if (listen(this->_socket, 10) == -1)
 		throw SocketListenException();
 	while (g_running)
 	{
@@ -68,12 +68,14 @@ int	Server::pollinEvent(const int fd, std::vector<pollfd> &fds)
 			return (ERROR);
 		Client &client = this->getClient(fd);
 		client.setInputBuffer(client.getInputBuffer() + message);
-		if (client.getInputBuffer().find("\n") != std::string::npos)
+		while (client.getInputBuffer().find("\n") != std::string::npos)
 		{
 			std::cout << "[Message to parse]: " << client.getInputBuffer() << std::endl;
 			message = client.getInputBuffer();
-			client.setInputBuffer("");
-			this->executeCommands(fd, message);
+			std::string execmessage = std::string(message.begin(), message.begin() + message.find("\n") + 1);
+			client.setInputBuffer(std::string(message.begin() + message.find("\n") + 1, message.end()));
+			if (this->executeCommands(fd, execmessage) == QUIT)
+				return (SUCCESS);
 		}
 	}
 	return (SUCCESS);
@@ -88,6 +90,13 @@ int	Server::addClient()
 	if (fd == -1)
 		return (fd);
 
+	if (this->_clients.size() >= MAX_CLIENTS)
+	{
+		std::cout << "Connection refused!" << std::endl;
+		//this->prepareResponse(fd, Response::OKquitSuccess("", "", "Server is Full"));
+		close(fd);
+		return (-1);
+	}
 	this->_clients.insert(std::pair<int, Client>(fd, Client(fd, this)));
 
 	return (fd);

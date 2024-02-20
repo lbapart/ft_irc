@@ -69,7 +69,7 @@ static bool	authRequired(int index)
 	return (true);
 }
 
-static void	executeCommand( const int &fd, const std::string &line, Server *server ) {
+static int	executeCommand( const int &fd, const std::string &line, Server *server ) {
 	int				index = 0;
 	std::string		commands[14] = {
 		"PASS",
@@ -97,56 +97,56 @@ static void	executeCommand( const int &fd, const std::string &line, Server *serv
 	if (authRequired(index) && !client.isAuthentificated())
 	{
 		client.handleNotAuthUser();
-		return ;
+		return (SUCCESS);
 	}
 	switch (index) {
 		case (0) :
 			client.setPassword(getArgByNbr(line, 1));
-			break;
+			return (SUCCESS);
 		case (1) : // NICK
 			client.setNickname(getArgByNbr(line, 1));
-			break;
+			return (SUCCESS);
 		case (2) : // Ping
 			client.pong();
-			break;
+			return (SUCCESS);
 		case (3) : // USER
 			client.setUsername(getArgByNbr(line, 1));
-			break;
+			return (SUCCESS);
 		case (4) : // TOPIC
 			client.setTopic(getArgByNbr(line, 1), getOptionalArg(line));
-			break;
+			return (SUCCESS);
 		case (5) : // PRIVMSG
 			client.sendPrvMsg(getArgByNbr(line, 1), getOptionalArg(line));
-			break;
+			return (SUCCESS);
 		case (6) : // JOIN
 			client.joinChannel(getArgByNbr(line, 1), getArgByNbr(line, 2));
-			break;
+			return (SUCCESS);
 		case (7) : // KICK
 			client.kickUser(getArgByNbr(line, 1), getArgByNbr(line, 2), getOptionalArg(line));
-			break;
+			return (SUCCESS);
 		case (8) : // QUIT
 			client.quit(getOptionalArg(line));
-			break;
+			return (QUIT);
 		case (9) : // INVITE
 			client.inviteUser(getArgByNbr(line, 1), getArgByNbr(line, 2));
-			break;
+			return (SUCCESS);
 		case (10):   // LEAVE
 			client.leaveChannel(getArgByNbr(line, 1));
-			break;
+			return (SUCCESS);
 		case (11):   // MODE
 			client.setMode(getArgByNbr(line, 2), getArgByNbr(line, 1), getArgByNbr(line, 3));
-			break;
+			return (SUCCESS);
 		case (12):   // CAP
-			break;
+			return (SUCCESS);
 		case (13):  //WHOIS
-			break;
+			return (SUCCESS);
 		default:
 			client.handleUnknownCommand(getArgByNbr(line, 0));
-			break;
+			return (SUCCESS);
 		}
 }
 
-void	Server::executeCommands( const int &fd, const std::string &line ) {
+int		Server::executeCommands( const int &fd, const std::string &line ) {
 	std::vector<std::string> cmds;
 
 	if (line.find("\r\n") != line.npos)
@@ -155,6 +155,7 @@ void	Server::executeCommands( const int &fd, const std::string &line ) {
 		cmds = parseLines(line, "\n");
 
 	for (std::vector<std::string>::iterator it = cmds.begin(); it != cmds.end(); it++) {
-			executeCommand(fd, *it, this);
+			return executeCommand(fd, *it, this);
 	}
+	return (SUCCESS);
 }

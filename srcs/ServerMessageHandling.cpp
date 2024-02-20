@@ -1,5 +1,4 @@
 #include "General.hpp"
-#include <cstddef>
 
 int	Server::getClientMessage(int fd, std::string &message)
 {
@@ -7,7 +6,7 @@ int	Server::getClientMessage(int fd, std::string &message)
 
 	std::memset(buffer, 0, 1024);
 
-	int bytesRead = recv(fd, buffer, 1024, 0);
+	int bytesRead = recv(fd, buffer, 1023, 0);
 	if (bytesRead <= 0)
 	{
 		std::cout << "Client disconnected" << std::endl;
@@ -16,6 +15,7 @@ int	Server::getClientMessage(int fd, std::string &message)
 	}
 	else
 	{
+		buffer[bytesRead] = '\0';
 		message = buffer;
 		std::cout << "[Message received]: " << message << std::endl;
 		return (SUCCESS);
@@ -24,6 +24,8 @@ int	Server::getClientMessage(int fd, std::string &message)
 
 void		Server::flushResponse(int fd)
 {
+	if (fd == -1)
+		return ;
 	if (this->getClient(fd).getOutputBuffer().empty())
 		return ;
 
@@ -35,7 +37,10 @@ void		Server::flushResponse(int fd)
 	{
 		int sent = send(fd, response.c_str() + bytesSent, response.size() - bytesSent, 0);
 		if (sent == -1)
+		{
 			std::cout << "Can't send response to a client" << std::endl;
+			break ;
+		}
 		bytesSent += sent;
 	}
 
@@ -43,5 +48,7 @@ void		Server::flushResponse(int fd)
 
 void		Server::prepareResponse(int fd, const std::string& response)
 {
+	if (fd == -1)
+		return ;
 	this->getClient(fd).setOutputBuffer(this->getClient(fd).getOutputBuffer() + response);
 }

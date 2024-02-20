@@ -38,7 +38,7 @@ class Server
 		void		run();
 		void		flushResponse(int fd);
 		void		prepareResponse(int fd, const std::string& response);
-		void		executeCommands( const int &fd, const std::string &line );
+		int			executeCommands( const int &fd, const std::string &line );
 
 		Channel*	addChannel(const std::string& channelName, const std::string& password, const int& fd);
 		void		removeChannel(const std::string& channelName);

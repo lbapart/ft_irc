@@ -33,7 +33,7 @@ Server::~Server()
 		close(it->fd);
 	}
 	close(this->_socket);
-	std::cout << "🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡🤡" << std::endl;
+	std::cout << "🤡🤡🤡🤡🤡🤡🤡🤡 THE END 🤡🤡🤡🤡🤡🤡🤡🤡" << std::endl;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -157,6 +157,22 @@ std::string				Server::getAvailableNickname(const std::string& nickname)
 
 void	Server::deleteClient(const int fd)
 {
+	Client &client = this->_clients[fd];
+	for (std::map<std::string, Channel>::iterator it = this->_channels.begin(); it != this->_channels.end();)
+	{
+		if (it->second.getNumberOfClients() == 1)
+		{
+			std::map<std::string, Channel>::iterator temp = it++;
+			this->removeChannel(temp->first);
+		}
+		else
+		{
+			it->second.removeClient(fd);
+			std::string response = Response::OKmessageSuccess(client.getNickname(), client.getUsername(), it->first, "has left the channel");
+			it->second.brodcastResponse(response);
+			it++;
+		}
+	}
 	this->_clients.erase(fd);
 	for (std::vector<pollfd>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++)
 	{
@@ -166,8 +182,6 @@ void	Server::deleteClient(const int fd)
 			break ;
 		}
 	}
-	for (std::map<std::string, Channel>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
-		it->second.removeClient(fd);
 	close(fd);
 }
 
