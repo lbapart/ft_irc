@@ -160,12 +160,12 @@ void	Server::deleteClient(const int fd)
 	Client &client = this->_clients[fd];
 	for (std::map<std::string, Channel>::iterator it = this->_channels.begin(); it != this->_channels.end();)
 	{
-		if (it->second.getNumberOfClients() == 1)
+		if (it->second.isClient(fd) && it->second.getNumberOfClients() == 1)
 		{
 			std::map<std::string, Channel>::iterator temp = it++;
 			this->removeChannel(temp->first);
 		}
-		else
+		else if (it->second.isClient(fd))
 		{
 			it->second.removeClient(fd);
 			std::string response = Response::OKmessageSuccess(client.getNickname(), client.getUsername(), it->first, "has left the channel");
