@@ -172,6 +172,8 @@ void	Server::deleteClient(const int fd)
 			it->second.brodcastResponse(response);
 			it++;
 		}
+		else
+			it++;
 	}
 	this->_clients.erase(fd);
 	for (std::vector<pollfd>::iterator it = this->_fds.begin(); it != this->_fds.end(); it++)
